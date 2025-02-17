@@ -13,7 +13,7 @@ async function loginUser(req, res) {
       return;
     }
 
-    if (bcrypt.compareSync(password, user.password || '')) {
+    if (!bcrypt.compareSync(password, user.password || '')) {
       res.status(401).json({ message: 'Password does not match' });
       return;
     }
