@@ -3,6 +3,7 @@ require('dotenv').config();
 // routers
 const authRouter = require('./routers/auth.router');
 const panRouter = require('./routers/pan.router');
+const companyRouter = require('./routers/company.router');
 const allotmentRouter = require('./routers/allotment.router');
 const { getGreyProfit } = require('./handlers/getGreyProfit');
 
@@ -22,6 +23,7 @@ app.use(authRouter);
 // auth middleware
 app.use(authenticate);
 app.use('/pan', panRouter);
+app.use('/', companyRouter);
 app.use('/', allotmentRouter);
 app.get('/getGreyProfit', getGreyProfit);
 
