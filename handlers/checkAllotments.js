@@ -1,6 +1,5 @@
 const { REGISTRAR } = require("../static/static");
 const { Company } = require("../schema/company.schema");
-// const { Pan } = require("../schema/panCards.schema");
 const { Allocation } = require("../schema/allocation.schema");
 const { checkPanWithBigshare } = require("./helpers/bigshare");
 const { checkPanWithCameo } = require("./helpers/cameo");
@@ -23,18 +22,6 @@ async function checkAllotments(req, res) {
       return;
     }
 
-    // // getting all pans
-    // const userPans = await Pan.find(
-    //   { userId: req.userId },
-    //   { panNumber: 1, _id: 0 }
-    // ).lean();
-    // if (userPans.length == 0) {
-    //   res.status(200).json([]);
-    //   return;
-    // }
-    // // from { panNumber: string } => [string]
-    // const pans = userPans.map((entry) => entry.panNumber);
-
     // getting all already existsing pans result
     let response = await Allocation.find(
       { panNumber: { $in: pans }, companyId: companyId },
@@ -56,6 +43,15 @@ async function checkAllotments(req, res) {
     });
 
     let newEntries = await fetchFromWebsite(company, diffPans);
+    let saveToDBCalls = newEntries.map((entry) => {
+      Allocation.create({
+        companyId: company._id,
+        panNumber: entry.panNumber,
+        result: entry.result,
+      });
+    });
+    await Promise.all(saveToDBCalls);
+
     response = response.concat(newEntries);
 
     res.status(200).json(response);
@@ -67,7 +63,7 @@ async function checkAllotments(req, res) {
 
 async function recheckAllotment(req, res) {
   const { companyId } = req.params;
-  const { pans } = req.body;
+  let { pans } = req.body;
 
   if (!companyId || !pans || pans.length == 0) {
     res.status(400).json({ message: "enter company to check allotment for" });
@@ -80,11 +76,12 @@ async function recheckAllotment(req, res) {
     return;
   }
 
+  pans = pans.map((pan) => ({ panNumber: pan }));
   let newEntries = await fetchFromWebsite(company, pans);
 
   if (newEntries.length == 1 && newEntries[0].result) {
     await Allocation.updateOne(
-      { panNumber: pans[0], companyId: company._id },
+      { panNumber: newEntries[0].panNumber, companyId: company._id },
       { result: newEntries[0].result },
       { upsert: true }
     );
@@ -116,7 +113,6 @@ async function fetchFromWebsite(company, panNumbers) {
       break;
   }
 
-  let saveToDBCalls = [];
   const response = [];
 
   Object.keys(resultMap).forEach((k) => {
@@ -125,16 +121,7 @@ async function fetchFromWebsite(company, panNumbers) {
       panNumber: k,
       result: resultMap[k],
     });
-    saveToDBCalls.push(
-      Allocation.create({
-        companyId: company._id,
-        panNumber: k,
-        result: resultMap[k],
-      })
-    );
   });
-
-  await Promise.all(saveToDBCalls);
 
   return response;
 }

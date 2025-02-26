@@ -28,7 +28,7 @@ async function addPAN(req, res) {
 
 async function getPANs(req, res) {
   try {
-    let pans = await Pan.find({ userId: req.userId }, { panNumber: 1, _id: 0 });
+    let pans = await Pan.find({ userId: req.userId }, { panNumber: 1, _id: 0 }).lean();
 
     res.status(200).json({ pans });
   } catch (err) {

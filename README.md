@@ -17,3 +17,9 @@ the to start `npm run start`
 - POST /login
 - GET, POST, DELETE /pan
 - GET checkAllotmentStatus
+
+### TODO
+
+- [ ] try every case for caching layer
+- [ ] add logger
+- [ ] company removal logic from scrapper
