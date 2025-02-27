@@ -3,7 +3,6 @@ require("dotenv").config();
 // routers
 const companyRouter = require("./routers/company.router");
 const allotmentRouter = require("./routers/allotment.router");
-const { getGreyProfit } = require("./handlers/getGreyProfit");
 
 // database connection
 require("./dbConnection");
@@ -18,7 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 // only using company and allotment routers for now
 app.use("/", companyRouter);
 app.use("/", allotmentRouter);
-app.get("/getGreyProfit", getGreyProfit);
 
 app.listen(process.env.PORT || 3000, (err, _) => {
   if (err) {
