@@ -24,7 +24,7 @@ async function checkAllotments(req, res) {
 
     // checking company if exists
     const content = Papa.parse(file.buffer.toString(), { header: false });
-    const pans = content.data;
+    const pans = content.data.map((ele) => ele[0]);
     if (!pans || pans.length == 0) {
       res.status(400).json({
         message:
