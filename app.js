@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 require("dotenv").config();
 // routers
 const companyRouter = require("./routers/company.router");
@@ -11,6 +12,12 @@ require("./dbConnection");
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 
 const app = express();
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET",
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
