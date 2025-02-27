@@ -62,9 +62,9 @@ async function getAllotmentsKfintech(cid, panNumber) {
       // remove non number chars
       captcha = captcha
         .split("")
-        .filter((v) => !isNaN(v))
+        .filter((v) => v && !isNaN(v))
         .join("");
-      console.log(captcha);
+      // console.log(captcha);
       // enter captcha
       await page.type(KFINTECH_SELECTOR.CAPTCHA_INPUT, ""); // reset
       await page.type(KFINTECH_SELECTOR.CAPTCHA_INPUT, captcha);
@@ -90,6 +90,9 @@ async function getAllotmentsKfintech(cid, panNumber) {
       if (errorDetails.toLowerCase().includes("pan details")) {
         matched = true;
         return STATUS.NOT_APPLIED;
+      } else if (errorDetails.toLowerCase().includes("ipo")) {
+        matched = true;
+        return "registrar removed the company from ipo";
       } else if (okButton) {
         // if ok button found then there is captcha error sorefresh and try again
         await okButton.click();
