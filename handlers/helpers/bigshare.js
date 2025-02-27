@@ -5,18 +5,20 @@ async function checkPanWithBigshare(company, pans) {
   try {
     let calls = [];
     for (let i = 0; i < pans.length; ++i) {
-      calls.push(
-        axios.post(SCRAP_URL.BIGSHARE, {
-          Company: company.companyCode,
-          PanNo: pans[i].panNumber,
-          SelectionType: "PN",
-          ddlType: "0",
-          Applicationno: "",
-          txtcsdl: "",
-          txtDPID: "",
-          txtClId: "",
-        })
-      );
+      if (pans[i].panNumber) {
+        calls.push(
+          axios.post(SCRAP_URL.BIGSHARE, {
+            Company: company.companyCode,
+            PanNo: pans[i].panNumber,
+            SelectionType: "PN",
+            ddlType: "0",
+            Applicationno: "",
+            txtcsdl: "",
+            txtDPID: "",
+            txtClId: "",
+          })
+        );
+      }
     }
 
     let results = await Promise.allSettled(calls);

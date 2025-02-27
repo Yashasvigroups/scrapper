@@ -5,13 +5,15 @@ async function checkPanWithCameo(company, pans) {
   try {
     let calls = [];
     for (let i = 0; i < pans.length; ++i) {
-      calls.push(
-        axios.post(SCRAP_URL.CAMEO, {
-          code: company.companyCode,
-          type: "pan",
-          value: pans[i].panNumber,
-        })
-      );
+      if (pans[i].panNumber) {
+        calls.push(
+          axios.post(SCRAP_URL.CAMEO, {
+            code: company.companyCode,
+            type: "pan",
+            value: pans[i].panNumber,
+          })
+        );
+      }
     }
 
     let results = await Promise.allSettled(calls);

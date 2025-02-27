@@ -7,6 +7,7 @@ const { checkPanWithCameo } = require("./helpers/cameo");
 const { checkPanWithLinkintime } = require("./helpers/linkintime");
 const { checkPanWithMaashitla } = require("./helpers/maashitla");
 const { checkPanWithKifntech } = require("./helpers/kfintech");
+const { Types } = require("mongoose");
 
 async function checkAllotments(req, res) {
   try {
@@ -21,10 +22,16 @@ async function checkAllotments(req, res) {
       res.status(400).json({ message: "please upload a csv file with pans" });
       return;
     }
+    if (!Types.ObjectId.isValid(companyId)) {
+      res.status(400).json({ message: "please enter valid companyId" });
+      return;
+    }
 
     // checking company if exists
     const content = Papa.parse(file.buffer.toString(), { header: false });
-    const pans = content.data.map((ele) => ele[0]);
+    const pans = content.data
+      .map((ele) => ele[0])
+      .filter((pan) => check10Length(pan));
     if (!pans || pans.length == 0) {
       res.status(400).json({
         message:
@@ -66,8 +73,11 @@ async function checkAllotments(req, res) {
         result: entry.result,
       });
     });
-    await Promise.all(saveToDBCalls);
-
+    try {
+      await Promise.all(saveToDBCalls);
+    } catch (err) {
+      console.log(err);
+    }
     response = response.concat(newEntries);
 
     res.status(200).json(response);
@@ -86,13 +96,20 @@ async function recheckAllotment(req, res) {
     return;
   }
 
+  if (!Types.ObjectId.isValid(companyId)) {
+    res.status(400).json({ message: "please enter valid companyId" });
+    return;
+  }
+
   const company = await Company.findOne({ _id: companyId }).lean();
   if (!company) {
     res.status(400).json({ message: "could not find the company" });
     return;
   }
 
-  pans = pans.map((pan) => ({ panNumber: pan }));
+  pans = pans
+    .filter((pan) => check10Length(pan))
+    .map((pan) => ({ panNumber: pan }));
   let newEntries = await fetchFromWebsite(company, pans);
 
   if (newEntries.length == 1 && newEntries[0].result) {
@@ -140,6 +157,10 @@ async function fetchFromWebsite(company, panNumbers) {
   });
 
   return response;
+}
+
+async function check10Length(pan) {
+  return pan?.trim()?.length === 10;
 }
 
 module.exports = { checkAllotments, recheckAllotment };

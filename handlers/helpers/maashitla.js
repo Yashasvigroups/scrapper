@@ -5,12 +5,14 @@ async function checkPanWithMaashitla(company, pans) {
   try {
     let calls = [];
     for (let i = 0; i < pans.length; ++i) {
-      calls.push(
-        axios.get(
-          `${SCRAP_URL.MAASHITLA}?company=${company.companyCode}&search=${pans[i].panNumber}`
-        )
-        // gb_logistics_commerce_limited
-      );
+      if (pans[i].panNumber) {
+        calls.push(
+          axios.get(
+            `${SCRAP_URL.MAASHITLA}?company=${company.companyCode}&search=${pans[i].panNumber}`
+          )
+          // gb_logistics_commerce_limited
+        );
+      }
     }
 
     let results = await Promise.allSettled(calls);

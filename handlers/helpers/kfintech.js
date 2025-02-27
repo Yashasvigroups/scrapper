@@ -7,7 +7,11 @@ async function checkPanWithKifntech(company, pans) {
   try {
     let calls = [];
     for (let i = 0; i < pans.length; ++i) {
-      calls.push(getAllotmentsKfintech(company.companyCode, pans[i].panNumber));
+      if (pans[i].panNumber) {
+        calls.push(
+          getAllotmentsKfintech(company.companyCode, pans[i].panNumber)
+        );
+      }
     }
 
     let results = await Promise.allSettled(calls);

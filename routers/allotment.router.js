@@ -5,11 +5,11 @@ const {
 } = require("../handlers/checkAllotments");
 const { fileHandler } = require("../middlewares/fileHandler");
 
-router.get(
+router.post(
   "/checkAllotments/:companyId",
   fileHandler.single("file"),
   checkAllotments
 );
-router.get("/recheckAllotment/:companyId", recheckAllotment);
+router.post("/recheckAllotment/:companyId", recheckAllotment);
 
 module.exports = router;

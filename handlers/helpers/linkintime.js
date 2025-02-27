@@ -8,15 +8,17 @@ async function checkPanWithLinkintime(company, pans) {
   try {
     let calls = [];
     for (let i = 0; i < pans.length; ++i) {
-      calls.push(
-        axios.post(SCRAP_URL.LINKINTIME, {
-          clientid: company.companyCode,
-          PAN: pans[i].panNumber,
-          CHKVAL: "1",
-          IFSC: "",
-          token: "",
-        })
-      );
+      if (pans[i].panNumber) {
+        calls.push(
+          axios.post(SCRAP_URL.LINKINTIME, {
+            clientid: company.companyCode,
+            PAN: pans[i].panNumber,
+            CHKVAL: "1",
+            IFSC: "",
+            token: "",
+          })
+        );
+      }
     }
 
     let results = await Promise.allSettled(calls);
