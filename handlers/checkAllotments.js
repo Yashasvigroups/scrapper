@@ -1,3 +1,4 @@
+const Papa = require("papaparse");
 const { REGISTRAR } = require("../static/static");
 const { Company } = require("../schema/company.schema");
 const { Allocation } = require("../schema/allocation.schema");
@@ -10,12 +11,27 @@ const { checkPanWithKifntech } = require("./helpers/kfintech");
 async function checkAllotments(req, res) {
   try {
     const { companyId } = req.params;
-    const { pans } = req.body;
-    if (!companyId || !pans || pans.length == 0) {
+    const file = req.file;
+
+    if (!companyId) {
       res.status(400).json({ message: "enter company to check allotment for" });
       return;
     }
+    if (!file) {
+      res.status(400).json({ message: "please upload a csv file with pans" });
+      return;
+    }
+
     // checking company if exists
+    const content = Papa.parse(file.buffer.toString(), { header: false });
+    const pans = content.data;
+    if (!pans || pans.length == 0) {
+      res.status(400).json({
+        message:
+          "empty csv file or unable to parse please enter valid csv syntax",
+      });
+      return;
+    }
     const company = await Company.findOne({ _id: companyId }).lean();
     if (!company) {
       res.status(400).json({ message: "could not find the company" });
