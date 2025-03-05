@@ -1,5 +1,5 @@
 # base image
-FROM node:20-bullseye
+FROM node:20-alpine
 # work dir all subsequent entries will be from /app
 WORKDIR /app
 # only package files first
