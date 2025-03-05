@@ -14,3 +14,9 @@ services:
       - "8080:8080"
     env_file:
       - .env
+  scrapper:
+    image: allotment-scraper
+    depends_on:
+      - db
+    env_file:
+      - .env
