@@ -67,11 +67,14 @@ async function checkAllotments(req, res) {
 
     let newEntries = await fetchFromWebsite(company, diffPans);
     let saveToDBCalls = newEntries.map((entry) => {
-      Allocation.create({
-        companyId: company._id,
-        panNumber: entry.panNumber,
-        result: entry.result,
-      });
+      Allocation.updateOne(
+        {
+          companyId: company._id,
+          panNumber: entry.panNumber,
+          result: entry.result,
+        },
+        { upsert: true }
+      );
     });
     try {
       await Promise.all(saveToDBCalls);
