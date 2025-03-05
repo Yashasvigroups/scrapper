@@ -1,13 +1,12 @@
 const mongoose = require("mongoose");
 
-if (process.env.NODE_ENV !== "production") {
+let connectDb = async () => {
+  await new Promise((res, _) => setTimeout(res, 3000));
+  console.log("##################### DB Connection");
+
   mongoose
-    .connect(process.env.MONGO_URI || "mongodb://localhost:27017/admin", {
-      dbName: process.env.DB_NAME || "ipo",
-      auth: {
-        username: process.env.DB_USER || "admin",
-        password: process.env.DB_PASSWORD || "password",
-      },
+    .connect(process.env.MONGO_URI, {
+      dbName: process.env.DB_NAME || "allotment",
     })
     .then(() => {
       console.log("DB connection established");
@@ -15,13 +14,5 @@ if (process.env.NODE_ENV !== "production") {
     .catch((err) => {
       console.log("Failed to connect to db ", err);
     });
-} else {
-  mongoose
-    .connect(process.env.MONGO_URI, { dbName: process.env.DB_NAME })
-    .then(() => {
-      console.log("DB connection established");
-    })
-    .catch((err) => {
-      console.log("Failed to connect to db ", err);
-    });
-}
+};
+connectDb();

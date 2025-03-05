@@ -30,5 +30,5 @@ app.listen(process.env.PORT || 3000, (err, _) => {
     console.log("Error initiating server");
     return;
   }
-  console.log("Server listening on 3000");
+  console.log(`Server listening on ${process.env.PORT || 3000}`);
 });
