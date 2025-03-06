@@ -6,6 +6,8 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo_data:/data/db
   app:
     image: allotment-node
     depends_on:
@@ -20,3 +22,6 @@ services:
       - db
     env_file:
       - .env
+
+volumes:
+  mongo_data:
