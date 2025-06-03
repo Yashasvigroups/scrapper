@@ -1,6 +1,6 @@
 const { XMLParser } = require("fast-xml-parser");
 const axios = require("axios");
-const { STATUS, SCRAP_URL } = require("../../static/static");
+const { SCRAP_URL } = require("../../static/static");
 
 const xmlParser = new XMLParser();
 
@@ -30,25 +30,29 @@ async function checkPanWithLinkintime(company, pans) {
 
       if (response.status == "rejected") {
         console.log(`rejected for pan ${panNumber}`);
-        res[panNumber] = STATUS.NOT_APPLIED;
+        // res[panNumber] = STATUS.NOT_APPLIED;
+        res[panNumber] = "NOT FOUND";
         return;
       }
 
       if (!response.value || !response.value.data || !response.value.data.d) {
         console.log(`empty response for pan ${pans[index].panNumber}`);
-        res[pans[index].panNumber] = STATUS.NOT_APPLIED;
+        // res[pans[index].panNumber] = STATUS.NOT_APPLIED;
+        res[pans[index].panNumber] = "NOT FOUND";
         return;
       }
 
       let data = response.value.data.d;
       data = xmlParser.parse(data).NewDataSet;
-      if (data == "") res[panNumber] = STATUS.NOT_APPLIED;
+      // if (data == "") res[panNumber] = STATUS.NOT_APPLIED;
+      if (data == "") res[panNumber] = "NOT FOUND";
       else {
         data = data.Table;
         if (data.SHARES > 0 && data.ALLOT == 0) {
-          res[panNumber] = STATUS.NOT_ALLOTED;
+          // res[panNumber] = STATUS.NOT_ALLOTED;
+          res[panNumber] = 0;
         } else if (data.ALLOT > 0) {
-          res[panNumber] = data.ALLOT + STATUS.ALLOTED;
+          res[panNumber] = data.ALLOT;
         }
       }
     });

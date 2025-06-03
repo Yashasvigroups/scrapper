@@ -22,8 +22,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // only using company and allotment routers for now
-app.use("/", companyRouter);
-app.use("/", allotmentRouter);
+app.use("", companyRouter);
+app.use("", allotmentRouter);
 
 app.listen(process.env.PORT || 3000, (err, _) => {
   if (err) {

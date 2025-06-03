@@ -113,11 +113,12 @@ async function getAllotmentsKfintech(cid, panNumber) {
           allotmentElement
         );
         if (alloted === "0") {
-          console.log("not alloted");
-          return STATUS.NOT_ALLOTED;
+          // console.log("not alloted");
+          // return STATUS.NOT_ALLOTED;
+          return 0;
         } else {
-          console.log(`${alloted} alloted`);
-          return alloted + STATUS.ALLOTED;
+          // console.log(`${alloted} alloted`);
+          return alloted;
         }
       }
       throw new Error("something happened in kfinttech");
