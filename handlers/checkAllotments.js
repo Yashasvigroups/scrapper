@@ -126,6 +126,33 @@ async function recheckAllotment(req, res) {
   res.status(200).json(newEntries);
 }
 
+async function checkBatchAllotment(req, res) {
+  let { pans, companyCode, registrar } = req.body;
+  if (!companyCode || !pans || pans.length == 0 || !registrar) {
+    res.status(400).json({ message: 'bad request need all the fields' });
+    return;
+  }
+  registrar = registrar.toUpperCase();
+  if (
+    [
+      REGISTRAR.CAMEO,
+      REGISTRAR.MAASHITLA,
+      REGISTRAR.BIGSHARE,
+      REGISTRAR.LINKINTIME,
+      REGISTRAR.KFINTECH,
+    ].findIndex((r) => r == registrar) == -1
+  ) {
+    res.status(400).json({ message: 'bad registrar' });
+    return;
+  }
+  // []string to []{panNumber: string}
+  pans = pans
+    .filter((pan) => check10Length(pan))
+    .map((pan) => ({ panNumber: pan }));
+  let newEntries = await fetchFromWebsite2(companyCode, pans, registrar);
+  return res.status(200).json(newEntries);
+}
+
 async function fetchFromWebsite(company, panNumbers) {
   // for the pans which are not yet in allocated
   let resultMap = {};
@@ -162,8 +189,44 @@ async function fetchFromWebsite(company, panNumbers) {
   return response;
 }
 
+async function fetchFromWebsite2(companyCode, panNumbers, registrar) {
+  // for the pans which are not yet in allocated
+  let resultMap = {};
+  switch (registrar) {
+    case REGISTRAR.CAMEO:
+      resultMap = await checkPanWithCameo(companyCode, panNumbers);
+      break;
+    case REGISTRAR.MAASHITLA:
+      resultMap = await checkPanWithMaashitla(companyCode, panNumbers);
+      break;
+    case REGISTRAR.BIGSHARE:
+      resultMap = await checkPanWithBigshare(companyCode, panNumbers);
+      break;
+    case REGISTRAR.LINKINTIME:
+      resultMap = await checkPanWithLinkintime(companyCode, panNumbers);
+      break;
+    case REGISTRAR.KFINTECH:
+      resultMap = await checkPanWithKifntech(companyCode, panNumbers);
+      break;
+    default:
+      break;
+  }
+
+  const response = [];
+
+  Object.keys(resultMap).forEach((k) => {
+    // add to result
+    response.push({
+      panNumber: k,
+      result: resultMap[k],
+    });
+  });
+
+  return response;
+}
+
 async function check10Length(pan) {
   return pan?.trim()?.length === 10;
 }
 
-module.exports = { checkAllotments, recheckAllotment };
+module.exports = { checkAllotments, recheckAllotment, checkBatchAllotment };
