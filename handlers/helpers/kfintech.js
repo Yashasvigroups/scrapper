@@ -1,16 +1,14 @@
-const { STATUS, SCRAP_URL, KFINTECH_SELECTOR } = require("../../static/static");
-const puppeteer = require("puppeteer");
+const { STATUS, SCRAP_URL, KFINTECH_SELECTOR } = require('../../static/static');
+const puppeteer = require('puppeteer');
 // const fs = require("node:fs");
-const Tesseract = require("tesseract.js");
+const Tesseract = require('tesseract.js');
 
-async function checkPanWithKifntech(company, pans) {
+async function checkPanWithKifntech(companyCode, pans) {
   try {
     let calls = [];
     for (let i = 0; i < pans.length; ++i) {
       if (pans[i].panNumber) {
-        calls.push(
-          getAllotmentsKfintech(company.companyCode, pans[i].panNumber)
-        );
+        calls.push(getAllotmentsKfintech(companyCode, pans[i].panNumber));
       }
     }
 
@@ -25,8 +23,8 @@ async function checkPanWithKifntech(company, pans) {
 
     return res;
   } catch (err) {
-    console.log("while checking allotment", err);
-    throw new Error("Something went wrong while checking allotment");
+    console.log('while checking allotment', err);
+    throw new Error('Something went wrong while checking allotment');
   }
 }
 
@@ -34,12 +32,12 @@ async function getAllotmentsKfintech(cid, panNumber) {
   const browser = await puppeteer.launch({
     headless: true,
     // slowMo: 100,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   const page = await browser.newPage();
   try {
     // load page
-    await page.goto(SCRAP_URL.KFINTECH, { waitUntil: "networkidle2" });
+    await page.goto(SCRAP_URL.KFINTECH, { waitUntil: 'networkidle2' });
     await page.waitForSelector(KFINTECH_SELECTOR.IPO_SELECT);
 
     // imitate selection
@@ -65,12 +63,12 @@ async function getAllotmentsKfintech(cid, panNumber) {
       let captcha = await processCaptcha(imageBuffer);
       // remove non number chars
       captcha = captcha
-        .split("")
+        .split('')
         .filter((v) => v && !isNaN(v))
-        .join("");
+        .join('');
       // console.log(captcha);
       // enter captcha
-      await page.type(KFINTECH_SELECTOR.CAPTCHA_INPUT, ""); // reset
+      await page.type(KFINTECH_SELECTOR.CAPTCHA_INPUT, ''); // reset
       await page.type(KFINTECH_SELECTOR.CAPTCHA_INPUT, captcha);
       // submit form by clicking submit
       await page.click(KFINTECH_SELECTOR.SUBMIT_BUTTON);
@@ -84,23 +82,23 @@ async function getAllotmentsKfintech(cid, panNumber) {
       // handeling cases
       const okButton = await page.$(KFINTECH_SELECTOR.OK_BUTTON);
       const errorElement = await page.$(KFINTECH_SELECTOR.POPUP_CONTENT);
-      let errorDetails = "";
+      let errorDetails = '';
       if (errorElement)
         errorDetails = await page.evaluate(
           (el) => el.textContent,
           errorElement
         );
       // when error message has pan details then it is not applied
-      if (errorDetails.toLowerCase().includes("pan details")) {
+      if (errorDetails.toLowerCase().includes('pan details')) {
         matched = true;
         return STATUS.NOT_APPLIED;
-      } else if (errorDetails.toLowerCase().includes("ipo")) {
+      } else if (errorDetails.toLowerCase().includes('ipo')) {
         matched = true;
-        return "registrar removed the company from ipo";
+        return 'registrar removed the company from ipo';
       } else if (okButton) {
         // if ok button found then there is captcha error sorefresh and try again
         await okButton.click();
-        let refreshCaptcha = await page.$("a.refresh");
+        let refreshCaptcha = await page.$('a.refresh');
         if (refreshCaptcha) await refreshCaptcha.click();
         await new Promise((r, j) => setTimeout(r, 800));
         continue;
@@ -112,7 +110,7 @@ async function getAllotmentsKfintech(cid, panNumber) {
           (el) => el.textContent,
           allotmentElement
         );
-        if (alloted === "0") {
+        if (alloted === '0') {
           // console.log("not alloted");
           // return STATUS.NOT_ALLOTED;
           return 0;
@@ -121,7 +119,7 @@ async function getAllotmentsKfintech(cid, panNumber) {
           return alloted;
         }
       }
-      throw new Error("something happened in kfinttech");
+      throw new Error('something happened in kfinttech');
     }
   } catch (err) {
     console.log(err);
@@ -134,8 +132,8 @@ async function getAllotmentsKfintech(cid, panNumber) {
 async function processCaptcha(imageBuffer) {
   try {
     // fs.writeFileSync("./" + Date.now() + ".png", imageBuffer);
-    let data = await Tesseract.recognize(imageBuffer, "eng", {
-      tessedit_char_whitelist: "0123456789",
+    let data = await Tesseract.recognize(imageBuffer, 'eng', {
+      tessedit_char_whitelist: '0123456789',
       tessedit_pageseg_mode: 6, // PSM mode optimized for blocks of text
     }).catch((error) => {
       console.error(`Error processing ${file}:`, error);

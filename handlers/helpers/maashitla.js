@@ -1,14 +1,14 @@
-const axios = require("axios");
-const { SCRAP_URL } = require("../../static/static");
+const axios = require('axios');
+const { SCRAP_URL } = require('../../static/static');
 
-async function checkPanWithMaashitla(company, pans) {
+async function checkPanWithMaashitla(companyCode, pans) {
   try {
     let calls = [];
     for (let i = 0; i < pans.length; ++i) {
       if (pans[i].panNumber) {
         calls.push(
           axios.get(
-            `${SCRAP_URL.MAASHITLA}?company=${company.companyCode}&search=${pans[i].panNumber}`
+            `${SCRAP_URL.MAASHITLA}?company=${companyCode}&search=${pans[i].panNumber}`
           )
           // gb_logistics_commerce_limited
         );
@@ -22,17 +22,17 @@ async function checkPanWithMaashitla(company, pans) {
     results.forEach((response, index) => {
       let panNumber = pans[index].panNumber;
 
-      if (response.status == "rejected") {
+      if (response.status == 'rejected') {
         console.log(`rejected for pan ${panNumber}`);
         // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = "NOT FOUND";
+        res[panNumber] = 'NOT FOUND';
         return;
       }
 
       if (!response.value || !response.value.data) {
         console.log(`empty response for pan ${panNumber}`);
         // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = "NOT FOUND";
+        res[panNumber] = 'NOT FOUND';
         return;
       }
 
@@ -40,7 +40,7 @@ async function checkPanWithMaashitla(company, pans) {
 
       if (!data || (data.share_Applied == 0 && data.share_Alloted == 0)) {
         // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = "NOT FOUND";
+        res[panNumber] = 'NOT FOUND';
       } else if (data.share_Applied > 0) {
         if (data.share_Alloted == 0) {
           // res[panNumber] = STATUS.NOT_ALLOTED;
@@ -53,8 +53,8 @@ async function checkPanWithMaashitla(company, pans) {
 
     return res;
   } catch (err) {
-    console.log("while checking allotment", err);
-    throw new Error("Something went wrong while checking allotment");
+    console.log('while checking allotment', err);
+    throw new Error('Something went wrong while checking allotment');
   }
 }
 

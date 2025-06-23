@@ -1,13 +1,13 @@
-const Papa = require("papaparse");
-const { REGISTRAR } = require("../static/static");
-const { Company } = require("../schema/company.schema");
-const { Allocation } = require("../schema/allocation.schema");
-const { checkPanWithBigshare } = require("./helpers/bigshare");
-const { checkPanWithCameo } = require("./helpers/cameo");
-const { checkPanWithLinkintime } = require("./helpers/linkintime");
-const { checkPanWithMaashitla } = require("./helpers/maashitla");
-const { checkPanWithKifntech } = require("./helpers/kfintech");
-const { Types } = require("mongoose");
+const Papa = require('papaparse');
+const { REGISTRAR } = require('../static/static');
+const { Company } = require('../schema/company.schema');
+const { Allocation } = require('../schema/allocation.schema');
+const { checkPanWithBigshare } = require('./helpers/bigshare');
+const { checkPanWithCameo } = require('./helpers/cameo');
+const { checkPanWithLinkintime } = require('./helpers/linkintime');
+const { checkPanWithMaashitla } = require('./helpers/maashitla');
+const { checkPanWithKifntech } = require('./helpers/kfintech');
+const { Types } = require('mongoose');
 
 async function checkAllotments(req, res) {
   try {
@@ -15,15 +15,15 @@ async function checkAllotments(req, res) {
     const file = req.file;
 
     if (!companyId) {
-      res.status(400).json({ message: "enter company to check allotment for" });
+      res.status(400).json({ message: 'enter company to check allotment for' });
       return;
     }
     if (!file) {
-      res.status(400).json({ message: "please upload a csv file with pans" });
+      res.status(400).json({ message: 'please upload a csv file with pans' });
       return;
     }
     if (!Types.ObjectId.isValid(companyId)) {
-      res.status(400).json({ message: "please enter valid companyId" });
+      res.status(400).json({ message: 'please enter valid companyId' });
       return;
     }
 
@@ -35,13 +35,13 @@ async function checkAllotments(req, res) {
     if (!pans || pans.length == 0) {
       res.status(400).json({
         message:
-          "empty csv file or unable to parse please enter valid csv syntax",
+          'empty csv file or unable to parse please enter valid csv syntax',
       });
       return;
     }
     const company = await Company.findOne({ _id: companyId }).lean();
     if (!company) {
-      res.status(400).json({ message: "could not find the company" });
+      res.status(400).json({ message: 'could not find the company' });
       return;
     }
 
@@ -85,8 +85,8 @@ async function checkAllotments(req, res) {
 
     res.status(200).json(response);
   } catch (err) {
-    console.log("Failed checking allotment: ", err?.message);
-    res.status(500).json({ message: "Internal Server Error" });
+    console.log('Failed checking allotment: ', err?.message);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 }
 
@@ -95,18 +95,18 @@ async function recheckAllotment(req, res) {
   let { pans } = req.body;
 
   if (!companyId || !pans || pans.length == 0) {
-    res.status(400).json({ message: "enter company to check allotment for" });
+    res.status(400).json({ message: 'enter company to check allotment for' });
     return;
   }
 
   if (!Types.ObjectId.isValid(companyId)) {
-    res.status(400).json({ message: "please enter valid companyId" });
+    res.status(400).json({ message: 'please enter valid companyId' });
     return;
   }
 
   const company = await Company.findOne({ _id: companyId }).lean();
   if (!company) {
-    res.status(400).json({ message: "could not find the company" });
+    res.status(400).json({ message: 'could not find the company' });
     return;
   }
 
@@ -131,19 +131,19 @@ async function fetchFromWebsite(company, panNumbers) {
   let resultMap = {};
   switch (company?.registrar) {
     case REGISTRAR.CAMEO:
-      resultMap = await checkPanWithCameo(company, panNumbers);
+      resultMap = await checkPanWithCameo(companyCode, panNumbers);
       break;
     case REGISTRAR.MAASHITLA:
-      resultMap = await checkPanWithMaashitla(company, panNumbers);
+      resultMap = await checkPanWithMaashitla(companyCode, panNumbers);
       break;
     case REGISTRAR.BIGSHARE:
-      resultMap = await checkPanWithBigshare(company, panNumbers);
+      resultMap = await checkPanWithBigshare(companyCode, panNumbers);
       break;
     case REGISTRAR.LINKINTIME:
-      resultMap = await checkPanWithLinkintime(company, panNumbers);
+      resultMap = await checkPanWithLinkintime(companyCode, panNumbers);
       break;
     case REGISTRAR.KFINTECH:
-      resultMap = await checkPanWithKifntech(company, panNumbers);
+      resultMap = await checkPanWithKifntech(companyCode, panNumbers);
       break;
     default:
       break;

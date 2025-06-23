@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose');
 
 const AllocationSchema = new Schema(
   {
@@ -16,5 +16,5 @@ const AllocationSchema = new Schema(
 );
 
 AllocationSchema.index({ panNumber: 1, companyId: 1 }, { unique: true });
-const Allocation = model("Allocation", AllocationSchema);
+const Allocation = model('Allocation', AllocationSchema);
 module.exports = { Allocation };

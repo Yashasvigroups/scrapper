@@ -1,15 +1,15 @@
-const axios = require("axios");
-const { SCRAP_URL } = require("../../static/static");
+const axios = require('axios');
+const { SCRAP_URL } = require('../../static/static');
 
-async function checkPanWithCameo(company, pans) {
+async function checkPanWithCameo(companyCode, pans) {
   try {
     let calls = [];
     for (let i = 0; i < pans.length; ++i) {
       if (pans[i].panNumber) {
         calls.push(
           axios.post(SCRAP_URL.CAMEO, {
-            code: company.companyCode,
-            type: "pan",
+            code: companyCode,
+            type: 'pan',
             value: pans[i].panNumber,
           })
         );
@@ -23,17 +23,17 @@ async function checkPanWithCameo(company, pans) {
     results.forEach((response, index) => {
       let panNumber = pans[index].panNumber;
 
-      if (response.status == "rejected") {
+      if (response.status == 'rejected') {
         console.log(`rejected for pan ${panNumber}`);
         // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = "NOT FOUND";
+        res[panNumber] = 'NOT FOUND';
         return;
       }
 
       if (!response.value || !response.value.data) {
         console.log(`empty response for pan ${panNumber}`);
         // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = "NOT FOUND";
+        res[panNumber] = 'NOT FOUND';
         return;
       }
 
@@ -41,7 +41,7 @@ async function checkPanWithCameo(company, pans) {
 
       if (data.length == 0) {
         // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = "NOT FOUND";
+        res[panNumber] = 'NOT FOUND';
       } else {
         if (data[0].refundAmount > 0 && data[0].allotedShares == 0) {
           // res[panNumber] = STATUS.NOT_ALLOTED;
@@ -55,8 +55,8 @@ async function checkPanWithCameo(company, pans) {
 
     return res;
   } catch (err) {
-    console.log("while checking allotment", err);
-    throw new Error("Something went wrong while checking allotment");
+    console.log('while checking allotment', err);
+    throw new Error('Something went wrong while checking allotment');
   }
 }
 
