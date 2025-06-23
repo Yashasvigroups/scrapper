@@ -24,26 +24,22 @@ async function checkPanWithMaashitla(companyCode, pans) {
 
       if (response.status == 'rejected') {
         console.log(`rejected for pan ${panNumber}`);
-        // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = 'NOT FOUND';
+        res[panNumber] = -1;
         return;
       }
 
       if (!response.value || !response.value.data) {
         console.log(`empty response for pan ${panNumber}`);
-        // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = 'NOT FOUND';
+        res[panNumber] = -1;
         return;
       }
 
       let data = response.value.data;
 
       if (!data || (data.share_Applied == 0 && data.share_Alloted == 0)) {
-        // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = 'NOT FOUND';
+        res[panNumber] = -1;
       } else if (data.share_Applied > 0) {
         if (data.share_Alloted == 0) {
-          // res[panNumber] = STATUS.NOT_ALLOTED;
           res[panNumber] = 0;
         } else if (data.share_Alloted > 0) {
           res[panNumber] = data.share_Alloted;

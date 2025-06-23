@@ -30,26 +30,22 @@ async function checkPanWithLinkintime(companyCode, pans) {
 
       if (response.status == 'rejected') {
         console.log(`rejected for pan ${panNumber}`);
-        // res[panNumber] = STATUS.NOT_APPLIED;
-        res[panNumber] = 'NOT FOUND';
+        res[panNumber] = -1;
         return;
       }
 
       if (!response.value || !response.value.data || !response.value.data.d) {
         console.log(`empty response for pan ${pans[index].panNumber}`);
-        // res[pans[index].panNumber] = STATUS.NOT_APPLIED;
-        res[pans[index].panNumber] = 'NOT FOUND';
+        res[pans[index].panNumber] = -1;
         return;
       }
 
       let data = response.value.data.d;
       data = xmlParser.parse(data).NewDataSet;
-      // if (data == "") res[panNumber] = STATUS.NOT_APPLIED;
-      if (data == '') res[panNumber] = 'NOT FOUND';
+      if (data == '') res[panNumber] = -1;
       else {
         data = data.Table;
         if (data.SHARES > 0 && data.ALLOT == 0) {
-          // res[panNumber] = STATUS.NOT_ALLOTED;
           res[panNumber] = 0;
         } else if (data.ALLOT > 0) {
           res[panNumber] = data.ALLOT;

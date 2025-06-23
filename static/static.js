@@ -14,12 +14,6 @@ const SCRAP_URL = {
   KFINTECH: 'https://kosmic.kfintech.com/ipostatus/',
 };
 
-const STATUS = {
-  NOT_APPLIED: 'NOT APPLIED',
-  NOT_ALLOTED: 'NOT ALLOTED',
-  ALLOTED: ' ALLOTED SHARES',
-};
-
 const KFINTECH_SELECTOR = {
   IPO_SELECT: 'select#ddl_ipo',
   PAN_OPTION: 'input#pan',

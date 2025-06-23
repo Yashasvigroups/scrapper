@@ -1,4 +1,4 @@
-const { STATUS, SCRAP_URL, KFINTECH_SELECTOR } = require('../../static/static');
+const { SCRAP_URL, KFINTECH_SELECTOR } = require('../../static/static');
 const puppeteer = require('puppeteer');
 // const fs = require("node:fs");
 const Tesseract = require('tesseract.js');
@@ -91,7 +91,7 @@ async function getAllotmentsKfintech(cid, panNumber) {
       // when error message has pan details then it is not applied
       if (errorDetails.toLowerCase().includes('pan details')) {
         matched = true;
-        return STATUS.NOT_APPLIED;
+        return -1;
       } else if (errorDetails.toLowerCase().includes('ipo')) {
         matched = true;
         return 'registrar removed the company from ipo';
@@ -111,11 +111,8 @@ async function getAllotmentsKfintech(cid, panNumber) {
           allotmentElement
         );
         if (alloted === '0') {
-          // console.log("not alloted");
-          // return STATUS.NOT_ALLOTED;
           return 0;
         } else {
-          // console.log(`${alloted} alloted`);
           return alloted;
         }
       }
