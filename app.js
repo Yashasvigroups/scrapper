@@ -1,12 +1,13 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
+// require('dotenv').config();
 // routers
-const companyRouter = require('./routers/company.router');
-const allotmentRouter = require('./routers/allotment.router');
+// const companyRouter = require('./routers/company.router');
+// const allotmentRouter = require('./routers/allotment.router');
+const { checkBatchAllotment } = require('./handlers/checkAllotments');
 
 // database connection
-require('./dbConnection');
+// require('./dbConnection');
 
 // for allowing expired tls certificates on 3rd class registrar sites
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
@@ -22,8 +23,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // only using company and allotment routers for now
-app.use('', companyRouter);
-app.use('', allotmentRouter);
+// app.use('', companyRouter);
+// app.use('', allotmentRouter);
+app.post('/checkBatch', checkBatchAllotment);
 
 app.listen(process.env.PORT || 3000, (err, _) => {
   if (err) {
