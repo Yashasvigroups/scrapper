@@ -27,7 +27,6 @@ const KFINTECH_SELECTOR = {
 };
 
 module.exports = {
-  STATUS,
   REGISTRAR,
   SCRAP_URL,
   KFINTECH_SELECTOR,
