@@ -42,8 +42,15 @@ async function checkPanWithLinkintime(companyCode, pans) {
 
       let data = response.value.data.d;
       data = xmlParser.parse(data).NewDataSet;
-      if (data == '') res[panNumber] = -1;
-      else {
+      if (!data || data == '') res[panNumber] = -1;
+      else if (data.Table.length > 0) {
+        data = data.Table.pop();
+        if (data.SHARES > 0 && data.ALLOT == 0) {
+          res[panNumber] = 0;
+        } else if (data.ALLOT > 0) {
+          res[panNumber] = data.ALLOT;
+        }
+      } else {
         data = data.Table;
         if (data.SHARES > 0 && data.ALLOT == 0) {
           res[panNumber] = 0;
