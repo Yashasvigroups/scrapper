@@ -5,6 +5,7 @@ const cors = require('cors');
 // const companyRouter = require('./routers/company.router');
 // const allotmentRouter = require('./routers/allotment.router');
 const { checkBatchAllotment } = require('./handlers/checkAllotments');
+const { scrapChittor } = require('./handlers/scrapChittor');
 
 // database connection
 // require('./dbConnection');
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.use('', companyRouter);
 // app.use('', allotmentRouter);
 app.post('/checkBatch', checkBatchAllotment);
+app.post('/scrap', scrapChittor);
 
 app.listen(process.env.PORT || 3000, (err, _) => {
   if (err) {
