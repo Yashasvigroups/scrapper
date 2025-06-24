@@ -46,7 +46,7 @@ async function checkPanWithLinkintime(companyCode, pans) {
       else {
         data = data.Table;
         if (data.length > 0) {
-          data = data.Table.pop();
+          data = data.pop();
         }
         if (data.SHARES > 0 && data.ALLOT == 0) {
           res[panNumber] = 0;
