@@ -23,3 +23,4 @@ the to start `npm run start`
 - [ ] try every case for caching layer
 - [ ] add logger
 - [ ] company removal logic from scrapper
+- [ ] check for multiple order in each registrar KFINTECH done
