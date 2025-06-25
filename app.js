@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-// require('dotenv').config();
+require('dotenv').config();
 // routers
 // const companyRouter = require('./routers/company.router');
 // const allotmentRouter = require('./routers/allotment.router');
