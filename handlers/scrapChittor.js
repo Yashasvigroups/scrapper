@@ -30,38 +30,35 @@ async function scrapChittor(req, res) {
     headers: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
-  function clg(str) {
-    console.log(str);
-  }
   const page = await browser.newPage();
   try {
     await page.goto(url);
     await page.waitForSelector('img.img-fluid');
 
-    response.logo = await page.evaluate(() => getLogo(clg));
-    response.faceValue = await page.evaluate(() => getFaceValue(clg));
-    response.lotSize = await page.evaluate(() => getLotSize(clg));
-    const obj = await page.evaluate(() => getLinks(clg));
+    response.logo = await page.evaluate(getLogo);
+    response.faceValue = await page.evaluate(getFaceValue);
+    response.lotSize = await page.evaluate(getLotSize);
+    const obj = await page.evaluate(getLinks);
     response.drhp = obj.drhp;
     response.rhp = obj.rhp;
     response.anchor = obj.anchor;
-    response.issueSize = await page.evaluate(() => getIssueSize(clg));
-    response.priceBand = await page.evaluate(() => getPriceBand(clg));
-    response.about = await page.evaluate(() => getAbout(clg));
-    response.objective = await page.evaluate(() => getObjective(clg));
-    response.peRatio = await page.evaluate(() => getPERatio(clg));
-    const address = await page.evaluate(() => getAddress(clg));
+    response.issueSize = await page.evaluate(getIssueSize);
+    response.priceBand = await page.evaluate(getPriceBand);
+    response.about = await page.evaluate(getAbout);
+    response.objective = await page.evaluate(getObjective);
+    response.peRatio = await page.evaluate(getPERatio);
+    const address = await page.evaluate(getAddress);
     response.address = address.address;
     response.contact = address.phone;
     response.email = address.email;
     response.website = address.website;
-    response.managers = await page.evaluate(() => getLeadManagers(clg));
-    const offered = await page.evaluate(() => getOffered(clg));
+    response.managers = await page.evaluate(getLeadManagers);
+    const offered = await page.evaluate(getOffered);
     response.qib = offered.qib;
     response.nibat = offered.nibat;
     response.nibbt = offered.nibbt;
     response.retail = offered.retail;
-    response.report = await page.evaluate(() => getReport(clg));
+    response.report = await page.evaluate(getReport);
 
     res.status(200).json(response);
   } catch (err) {
@@ -73,17 +70,16 @@ async function scrapChittor(req, res) {
   return;
 }
 
-function getLogo(clg) {
+function getLogo() {
   const images = document.querySelectorAll('img.img-fluid');
   const withTitle = Array.from(images).filter((v) => v.getAttribute('title'));
   if (withTitle.length > 0) {
     return withTitle[0].src;
   }
-  clg('logo', withTitle);
   return '';
 }
 
-function getLinks(clg) {
+function getLinks() {
   const obj = {
     rhp: '',
     drhp: '',
@@ -99,86 +95,88 @@ function getLinks(clg) {
     } else if (v?.innerText?.toLowerCase().includes('anchor')) {
       obj.anchor = link;
     } else {
-      clg('links', link);
     }
   });
   return obj;
 }
 
-function getLotSize(clg) {
-  const element = document.querySelector(
-    '#main > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(5) > td:nth-child(2)'
-  )?.innerText;
-  clg('lot', element);
-  if (element?.toLowerCase()?.includes(' shares')) {
-    return element?.split(' Shares')[0];
+function getLotSize() {
+  const ele = document.querySelectorAll('table');
+  if (ele.length >= 1) {
+    const element = ele[1].querySelector(
+      'tr:nth-child(5) > td:nth-child(2)'
+    )?.innerText;
+    if (element?.toLowerCase()?.includes(' shares')) {
+      return element?.split(' Shares')[0];
+    }
   }
-  clg('lot', element);
   return 0;
 }
 
-function getFaceValue(clg) {
-  const element = document.querySelector(
-    '#main > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(3) > td:nth-child(2)'
-  )?.innerText;
-  clg('face', element);
-  if (element?.includes(' per share')) {
-    return element?.split(' per share')[0].split('₹')[1];
+function getFaceValue() {
+  const ele = document.querySelectorAll('table');
+  if (ele.length >= 1) {
+    const element = ele[1].querySelector(
+      'tr:nth-child(3) > td:nth-child(2)'
+    )?.innerText;
+    if (element?.toLowerCase()?.includes(' per share')) {
+      return element?.split(' per share')[0]?.split('₹')[1];
+    }
   }
-  clg('face', element);
   return 0;
 }
 
-function getIssueSize(clg) {
-  const element = document.querySelector(
-    '#main > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(7) > td:nth-child(2)'
-  )?.innerText;
-  clg('issueSize', element);
-  if (element?.includes(' shares')) {
-    return element?.split(' shares')[0]?.replaceAll(',', '');
+function getIssueSize() {
+  const ele = document.querySelectorAll('table');
+  if (ele.length >= 1) {
+    const element = ele[1].querySelector(
+      'tr:nth-child(7) > td:nth-child(2)'
+    )?.innerText;
+    if (element?.toLowerCase()?.includes(' shares')) {
+      return element?.split(' shares')[0]?.replaceAll(',', '');
+    }
   }
-  clg('issueSize', element);
   return 0;
 }
 
-function getPriceBand(clg) {
-  const element = document.querySelector(
-    '#main > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(4) > td:nth-child(2)'
-  )?.innerText;
-  clg('priceBand', element);
-  if (element?.includes(' per share')) {
-    return element?.split(' per share')[0];
+function getPriceBand() {
+  const ele = document.querySelectorAll('table');
+  if (ele.length >= 1) {
+    const element = ele[1].querySelector(
+      'tr:nth-child(4) > td:nth-child(2)'
+    )?.innerText;
+    if (element?.toLowerCase()?.includes(' per share')) {
+      return element?.split(' per share')[0];
+    }
   }
-  clg('priceBand', element);
-  return '';
+  return 0;
 }
 
-function getAbout(clg) {
+function getAbout() {
   const elements = document.querySelector('#ipoSummary');
   return Array.from(elements.children)
     .map((v) => v.innerText)
     .join(' \n\n');
 }
 
-function getObjective(clg) {
+function getObjective() {
   const element = document.querySelector('#ObjectiveIssue > tbody');
   return Array.from(element?.childNodes)
     .map((v) => v.childNodes[3].innerText)
     .join(' \n\n');
 }
 
-function getPERatio(clg) {
+function getPERatio() {
   const element = document.querySelector(
     `[data-bs-title="P/E Ratio Information"]`
   )?.parentElement?.parentElement;
   if (element && element?.childNodes?.length >= 3) {
     return element?.childNodes[2]?.innerText;
   }
-  clg('peRatio', element);
   return 0;
 }
 
-function getAddress(clg) {
+function getAddress() {
   const obj = {
     address: '',
     phone: '',
@@ -197,7 +195,7 @@ function getAddress(clg) {
   return obj;
 }
 
-function getLeadManagers(clg) {
+function getLeadManagers() {
   const element =
     document.querySelector('#recommendation')?.parentElement?.childNodes;
   if (element.length >= 1) {
@@ -206,11 +204,10 @@ function getLeadManagers(clg) {
       ?.map((v) => v?.querySelector('a')?.innerText)
       .join(', ');
   }
-  clg('lead', element);
   return '';
 }
 
-function getOffered(clg) {
+function getOffered() {
   function rp(str) {
     return str.split(' ')[0].replaceAll(',', '');
   }
@@ -220,9 +217,11 @@ function getOffered(clg) {
     nibbt: 0,
     retail: 0,
   };
-  const element = document.querySelector(
-    '#main > div:nth-child(6) > div:nth-child(1) > div:nth-child(2) > div > div > table'
-  );
+  const ele = document.querySelectorAll('table');
+  if (ele.length < 3) {
+    return obj;
+  }
+  const element = ele[2];
   element?.childNodes?.forEach((v) => {
     if (
       v.nodeName == 'TBODY' &&
@@ -264,8 +263,7 @@ function getOffered(clg) {
   });
   return obj;
 }
-
-function getReport(clg) {
+function getReport() {
   const element = document.querySelector('#financialTable > tbody');
   const rows = Array.from(element?.childNodes);
   rows.splice(4);
