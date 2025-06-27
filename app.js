@@ -17,7 +17,7 @@ const app = express();
 app.use(
   cors({
     origin: '*',
-    methods: 'GET',
+    methods: '*',
   })
 );
 app.use(express.json());
