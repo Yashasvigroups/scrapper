@@ -106,6 +106,7 @@ function getLotSize() {
   const element = document.querySelector(
     '#main > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(5) > td:nth-child(2)'
   )?.innerText;
+  console.log('lot', element);
   if (element?.toLowerCase()?.includes(' shares')) {
     return element?.split(' Shares')[0];
   }
@@ -117,6 +118,7 @@ function getFaceValue() {
   const element = document.querySelector(
     '#main > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(3) > td:nth-child(2)'
   )?.innerText;
+  console.log('face', element);
   if (element?.includes(' per share')) {
     return element?.split(' per share')[0].split('₹')[1];
   }
@@ -128,6 +130,7 @@ function getIssueSize() {
   const element = document.querySelector(
     '#main > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(7) > td:nth-child(2)'
   )?.innerText;
+  console.log('issueSize', element);
   if (element?.includes(' shares')) {
     return element?.split(' shares')[0]?.replaceAll(',', '');
   }
@@ -139,6 +142,7 @@ function getPriceBand() {
   const element = document.querySelector(
     '#main > div:nth-child(6) > div:nth-child(1) > div:nth-child(1) > table > tbody > tr:nth-child(4) > td:nth-child(2)'
   )?.innerText;
+  console.log('priceBand', element);
   if (element?.includes(' per share')) {
     return element?.split(' per share')[0];
   }
