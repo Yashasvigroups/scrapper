@@ -34,31 +34,56 @@ async function scrapChittor(req, res) {
   try {
     await page.goto(url);
     await page.waitForSelector('img.img-fluid');
-
-    response.logo = await page.evaluate(getLogo);
-    response.faceValue = await page.evaluate(getFaceValue);
-    response.lotSize = await page.evaluate(getLotSize);
-    const obj = await page.evaluate(getLinks);
-    response.drhp = obj.drhp;
-    response.rhp = obj.rhp;
-    response.anchor = obj.anchor;
-    response.issueSize = await page.evaluate(getIssueSize);
-    response.priceBand = await page.evaluate(getPriceBand);
-    response.about = await page.evaluate(getAbout);
-    response.objective = await page.evaluate(getObjective);
-    response.peRatio = await page.evaluate(getPERatio);
-    const address = await page.evaluate(getAddress);
+    const [
+      logo,
+      faceValue,
+      lotSize,
+      links,
+      issueSize,
+      priceBand,
+      about,
+      objective,
+      pERatio,
+      address,
+      leadManagers,
+      offered,
+      report,
+    ] = await Promise.all([
+      page.evaluate(getLogo),
+      page.evaluate(getFaceValue),
+      page.evaluate(getLotSize),
+      page.evaluate(getLinks),
+      page.evaluate(getIssueSize),
+      page.evaluate(getPriceBand),
+      page.evaluate(getAbout),
+      page.evaluate(getObjective),
+      page.evaluate(getPERatio),
+      page.evaluate(getAddress),
+      page.evaluate(getLeadManagers),
+      page.evaluate(getOffered),
+      page.evaluate(getReport),
+    ]);
+    response.logo = logo;
+    response.faceValue = faceValue;
+    response.lotSize = lotSize;
+    response.drhp = links.drhp;
+    response.rhp = links.rhp;
+    response.anchor = links.anchor;
+    response.issueSize = issueSize;
+    response.priceBand = priceBand;
+    response.about = about;
+    response.objective = objective;
+    response.peRatio = pERatio;
     response.address = address.address;
     response.contact = address.phone;
     response.email = address.email;
     response.website = address.website;
-    response.managers = await page.evaluate(getLeadManagers);
-    const offered = await page.evaluate(getOffered);
+    response.managers = leadManagers;
     response.qib = offered.qib;
     response.nibat = offered.nibat;
     response.nibbt = offered.nibbt;
     response.retail = offered.retail;
-    response.report = await page.evaluate(getReport);
+    response.report = report;
 
     res.status(200).json(response);
   } catch (err) {
