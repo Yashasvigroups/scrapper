@@ -76,6 +76,7 @@ function getLogo() {
   if (withTitle.length > 0) {
     return withTitle[0].src;
   }
+  console.log('logo', withTitle);
   return '';
 }
 
@@ -94,6 +95,8 @@ function getLinks() {
       obj.rhp = link;
     } else if (v?.innerText?.toLowerCase().includes('anchor')) {
       obj.anchor = link;
+    } else {
+      console.log('links', link);
     }
   });
   return obj;
@@ -106,6 +109,7 @@ function getLotSize() {
   if (element?.toLowerCase()?.includes(' shares')) {
     return element?.split(' Shares')[0];
   }
+  console.log('lot', element);
   return 0;
 }
 
@@ -116,6 +120,7 @@ function getFaceValue() {
   if (element?.includes(' per share')) {
     return element?.split(' per share')[0].split('₹')[1];
   }
+  console.log('face', element);
   return 0;
 }
 
@@ -126,6 +131,7 @@ function getIssueSize() {
   if (element?.includes(' shares')) {
     return element?.split(' shares')[0]?.replaceAll(',', '');
   }
+  console.log('issueSize', element);
   return 0;
 }
 
@@ -136,6 +142,8 @@ function getPriceBand() {
   if (element?.includes(' per share')) {
     return element?.split(' per share')[0];
   }
+  console.log('priceBand', element);
+  return '';
 }
 
 function getAbout() {
@@ -159,6 +167,7 @@ function getPERatio() {
   if (element && element?.childNodes?.length >= 3) {
     return element?.childNodes[2]?.innerText;
   }
+  console.log('peRatio', element);
   return 0;
 }
 
@@ -190,6 +199,7 @@ function getLeadManagers() {
       ?.map((v) => v?.querySelector('a')?.innerText)
       .join(', ');
   }
+  console.log('lead', element);
   return '';
 }
 
