@@ -1,7 +1,7 @@
 const { default: puppeteer } = require('puppeteer');
 
 async function scrapChittor(req, res) {
-  const { url } = req.body;
+  const { title, id } = req.params;
   const response = {
     lotSize: '',
     issueSize: '',
@@ -26,6 +26,7 @@ async function scrapChittor(req, res) {
     anchor: '',
     report: [],
   };
+  let url = 'https://www.chittorgarh.com/ipo/' + title + '/' + id;
   const browser = await puppeteer.launch({
     headers: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
