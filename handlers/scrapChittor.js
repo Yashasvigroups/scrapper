@@ -99,7 +99,7 @@ async function scrapChittor(req, res) {
 function getLogo() {
   const images = document.querySelectorAll('img.img-fluid');
   const withTitle = Array.from(images).filter((v) => v.getAttribute('title'));
-  if (withTitle.length > 0) {
+  if (withTitle?.length > 0) {
     return withTitle[0].src;
   }
   return '';
@@ -112,7 +112,7 @@ function getLinks() {
     anchor: '',
   };
   const opts = document.querySelector('ul.dropdown-menu');
-  opts.childNodes.forEach((v) => {
+  opts?.childNodes?.forEach((v) => {
     const link = v?.querySelector('a')?.href;
     if (v?.innerText?.toLowerCase().includes('drhp')) {
       obj.drhp = link;
@@ -180,16 +180,16 @@ function getPriceBand() {
 
 function getAbout() {
   const elements = document.querySelector('#ipoSummary');
-  return Array.from(elements.children)
-    .map((v) => v.innerText)
-    .join(' \n\n');
+  return Array.from(elements?.children || [])
+    ?.map((v) => v?.innerText)
+    ?.join(' \n\n');
 }
 
 function getObjective() {
   const element = document.querySelector('#ObjectiveIssue > tbody');
-  return Array.from(element?.childNodes)
-    .map((v) => v.childNodes[3].innerText)
-    .join(' \n\n');
+  return Array.from(element?.childNodes || [])
+    ?.map((v) => v.childNodes[3].innerText)
+    ?.join(' \n\n');
 }
 
 function getPERatio() {
@@ -212,12 +212,12 @@ function getAddress() {
   let text = document
     .querySelector('address > p')
     ?.innerText?.split('\nPhone: ');
-  obj.address = text[0];
-  text = text[1].split('\nEmail: ');
-  obj.phone = text[0];
-  text = text[1].split('\nWebsite: ');
-  obj.email = text[0];
-  obj.website = text[1];
+  if (text?.length) obj.address = text[0];
+  if (text?.length) text = text[1].split('\nEmail: ');
+  if (text?.length) obj.phone = text[0];
+  if (text?.length) text = text[1].split('\nWebsite: ');
+  if (text?.length) obj.email = text[0];
+  if (text?.length) obj.website = text[1];
   return obj;
 }
 
@@ -226,7 +226,7 @@ function getLeadManagers() {
     document.querySelector('#recommendation')?.parentElement?.childNodes;
   if (element.length >= 1) {
     const ol = element[1]?.querySelector('ol');
-    return Array.from(ol?.childNodes)
+    return Array.from(ol?.childNodes || [])
       ?.map((v) => v?.querySelector('a')?.innerText)
       .join(', ');
   }
@@ -235,7 +235,7 @@ function getLeadManagers() {
 
 function getOffered() {
   function rp(str) {
-    return str.split(' ')[0].replaceAll(',', '');
+    return str?.split(' ')[0]?.replaceAll(',', '');
   }
   const obj = {
     qib: 0,
@@ -289,9 +289,10 @@ function getOffered() {
   });
   return obj;
 }
+
 function getReport() {
   const element = document.querySelector('#financialTable > tbody');
-  const rows = Array.from(element?.childNodes);
+  const rows = Array.from(element?.childNodes || []);
   rows.splice(4);
   const arr = [];
   rows?.forEach((v, i) => {
