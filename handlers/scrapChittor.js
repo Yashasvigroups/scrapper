@@ -20,6 +20,11 @@ async function scrapChittor(req, res) {
     objective: '',
     managers: '',
     promoters: '',
+    amountIn: '',
+    allotmentDate: new Date().toLocaleDateString(),
+    sharesCreditDate: new Date().toLocaleDateString(),
+    refundDate: new Date().toLocaleDateString(),
+    listingDate: new Date().toLocaleDateString(),
     logo: '',
     drhp: '',
     rhp: '',
@@ -49,6 +54,8 @@ async function scrapChittor(req, res) {
       leadManagers,
       offered,
       report,
+      dates,
+      promoters,
     ] = await Promise.all([
       page.evaluate(getLogo),
       page.evaluate(getFaceValue),
@@ -63,6 +70,8 @@ async function scrapChittor(req, res) {
       page.evaluate(getLeadManagers),
       page.evaluate(getOffered),
       page.evaluate(getReport),
+      page.evaluate(getDates),
+      page.evaluate(getPromoters),
     ]);
     response.logo = logo;
     response.faceValue = faceValue;
@@ -84,7 +93,13 @@ async function scrapChittor(req, res) {
     response.nibat = offered.nibat;
     response.nibbt = offered.nibbt;
     response.retail = offered.retail;
-    response.report = report;
+    response.report = report.arr;
+    response.amountIn = report.amountIn;
+    response.allotmentDate = dates.allotmentDate;
+    response.refundDate = dates.refundDate;
+    response.sharesCreditDate = dates.sharesCreditDate;
+    response.listingDate = dates.listingDate;
+    response.promoters = promoters;
 
     res.status(200).json(response);
   } catch (err) {
@@ -311,7 +326,57 @@ function getReport() {
     });
   });
 
-  return arr;
+  return { arr, amountIn: element?.nextElementSibling?.innerText };
+}
+
+function getDates() {
+  const dates = {
+    allotmentDate: new Date().toLocaleDateString(),
+    sharesCreditDate: new Date().toLocaleDateString(),
+    refundDate: new Date().toLocaleDateString(),
+    listingDate: new Date().toLocaleDateString(),
+  };
+  const ele = document.querySelectorAll('table');
+  if (ele.length >= 4) {
+    const element = ele[4].querySelector('tbody');
+    element.childNodes.forEach((v) => {
+      if (v.childNodes.length == 0) {
+        return;
+      }
+      const label = v.childNodes[0]?.innerText.toLowerCase();
+      if (label.includes('allotment')) {
+        dates.allotmentDate = new Date(
+          v.childNodes[1]?.innerText
+        ).toLocaleDateString();
+      }
+      if (label.includes('credit')) {
+        dates.sharesCreditDate = new Date(
+          v.childNodes[1]?.innerText
+        ).toLocaleDateString();
+      }
+      if (label.includes('refund')) {
+        dates.refundDate = new Date(
+          v.childNodes[1]?.innerText
+        ).toLocaleDateString();
+      }
+      if (label.includes('listing')) {
+        dates.listingDate = new Date(
+          v.childNodes[1]?.innerText
+        ).toLocaleDateString();
+      }
+    });
+  }
+  return dates;
+}
+
+function getPromoters() {
+  let promoters = '';
+  document.querySelectorAll('h2').forEach((v) => {
+    if (v.innerText.includes('Holding')) {
+      promoters = v.nextElementSibling.innerText;
+    }
+  });
+  return promoters;
 }
 
 module.exports = { scrapChittor };
