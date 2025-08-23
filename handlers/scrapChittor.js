@@ -129,11 +129,11 @@ function getLinks() {
   const opts = document.querySelector('ul.dropdown-menu');
   opts?.childNodes?.forEach((v) => {
     const link = v?.querySelector('a')?.href;
-    if (v?.innerText?.toLowerCase().includes('drhp')) {
+    if (v?.innerText?.toLowerCase()?.includes('drhp')) {
       obj.drhp = link;
-    } else if (v?.innerText?.toLowerCase().includes('rhp')) {
+    } else if (v?.innerText?.toLowerCase()?.includes('rhp')) {
       obj.rhp = link;
-    } else if (v?.innerText?.toLowerCase().includes('anchor')) {
+    } else if (v?.innerText?.toLowerCase()?.includes('anchor')) {
       obj.anchor = link;
     } else {
     }
@@ -271,31 +271,31 @@ function getOffered() {
     ) {
       // handle tr niibt, niiat
       v?.childNodes?.forEach((tr) => {
-        if (tr?.childNodes[0]?.innerText?.toLowerCase().includes('bnii')) {
+        if (tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('bnii')) {
           obj.nibat = rp(tr?.childNodes[1]?.innerText);
         } else if (
-          tr?.childNodes[0]?.innerText?.toLowerCase().includes('snii')
+          tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('snii')
         ) {
           obj.nibbt = rp(tr?.childNodes[1]?.innerText);
         }
       });
-    } else if (v.nodeName == 'TBODY' && v.className.includes('collaps')) {
+    } else if (v.nodeName == 'TBODY' && v.className?.includes('collaps')) {
       // skip QIB collapsable
     } else if (v.nodeName == 'TBODY') {
       // handle retail, employee and other
       v?.childNodes?.forEach((tr) => {
-        if (tr?.childNodes[0]?.innerText?.toLowerCase().includes('retail')) {
+        if (tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('retail')) {
           obj.retail = rp(tr?.childNodes[1]?.innerText);
         } else if (
-          tr?.childNodes[0]?.innerText?.toLowerCase().includes('qib')
+          tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('qib')
         ) {
           obj.qib = rp(tr?.childNodes[1]?.innerText);
         } else if (
-          tr?.childNodes[0]?.innerText?.toLowerCase().includes('bnii')
+          tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('bnii')
         ) {
           obj.nibat = rp(tr?.childNodes[1]?.innerText);
         } else if (
-          tr?.childNodes[0]?.innerText?.toLowerCase().includes('snii')
+          tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('snii')
         ) {
           obj.nibbt = rp(tr?.childNodes[1]?.innerText);
         }
@@ -344,22 +344,22 @@ function getDates() {
         return;
       }
       const label = v.childNodes[0]?.innerText?.toLowerCase();
-      if (label.includes('allotment')) {
+      if (label?.includes('allotment')) {
         dates.allotmentDate = new Date(
           v.childNodes[1]?.innerText
         ).toLocaleDateString();
       }
-      if (label.includes('credit')) {
+      if (label?.includes('credit')) {
         dates.sharesCreditDate = new Date(
           v.childNodes[1]?.innerText
         ).toLocaleDateString();
       }
-      if (label.includes('refund')) {
+      if (label?.includes('refund')) {
         dates.refundDate = new Date(
           v.childNodes[1]?.innerText
         ).toLocaleDateString();
       }
-      if (label.includes('listing')) {
+      if (label?.includes('listing')) {
         dates.listingDate = new Date(
           v.childNodes[1]?.innerText
         ).toLocaleDateString();
@@ -372,7 +372,7 @@ function getDates() {
 function getPromoters() {
   let promoters = '';
   document.querySelectorAll('h2').forEach((v) => {
-    if (v.innerText.includes('Holding')) {
+    if (v.innerText?.includes('Holding')) {
       promoters = v.nextElementSibling.innerText;
     }
   });
