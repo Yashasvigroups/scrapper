@@ -343,7 +343,7 @@ function getDates() {
       if (v.childNodes.length == 0) {
         return;
       }
-      const label = v.childNodes[0]?.innerText.toLowerCase();
+      const label = v.childNodes[0]?.innerText?.toLowerCase();
       if (label.includes('allotment')) {
         dates.allotmentDate = new Date(
           v.childNodes[1]?.innerText
