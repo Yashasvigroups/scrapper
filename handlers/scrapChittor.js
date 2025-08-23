@@ -337,35 +337,37 @@ function getDates() {
     listingDate: new Date().toLocaleDateString(),
   };
   const ele = document.querySelectorAll('table');
-  if (ele.length >= 4) {
-    const element = ele[4].querySelector('tbody');
-    element.childNodes.forEach((v) => {
-      if (v.childNodes.length == 0) {
-        return;
-      }
-      const label = v.childNodes[0]?.innerText?.toLowerCase();
-      if (label?.includes('allotment')) {
-        dates.allotmentDate = new Date(
-          v.childNodes[1]?.innerText
-        ).toLocaleDateString();
-      }
-      if (label?.includes('credit')) {
-        dates.sharesCreditDate = new Date(
-          v.childNodes[1]?.innerText
-        ).toLocaleDateString();
-      }
-      if (label?.includes('refund')) {
-        dates.refundDate = new Date(
-          v.childNodes[1]?.innerText
-        ).toLocaleDateString();
-      }
-      if (label?.includes('listing')) {
-        dates.listingDate = new Date(
-          v.childNodes[1]?.innerText
-        ).toLocaleDateString();
-      }
-    });
-  }
+  ele.forEach((element) => {
+    if (element.innerText?.includes('Tentative Allotment')) {
+      element = element.querySelector('tbody');
+      element.childNodes.forEach((v) => {
+        if (v.childNodes.length == 0) {
+          return;
+        }
+        const label = v.childNodes[0]?.innerText?.toLowerCase();
+        if (label?.includes('allotment')) {
+          dates.allotmentDate = new Date(
+            v.childNodes[1]?.innerText
+          ).toLocaleDateString();
+        }
+        if (label?.includes('credit')) {
+          dates.sharesCreditDate = new Date(
+            v.childNodes[1]?.innerText
+          ).toLocaleDateString();
+        }
+        if (label?.includes('refund')) {
+          dates.refundDate = new Date(
+            v.childNodes[1]?.innerText
+          ).toLocaleDateString();
+        }
+        if (label?.includes('listing')) {
+          dates.listingDate = new Date(
+            v.childNodes[1]?.innerText
+          ).toLocaleDateString();
+        }
+      });
+    }
+  });
   return dates;
 }
 
