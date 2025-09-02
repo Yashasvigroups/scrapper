@@ -22,7 +22,7 @@ async function scrapChittor(req, res) {
     promoters: '',
     amountIn: '',
     allotmentDate: new Date().toLocaleDateString(),
-    sharesCreditDate: new Date().toLocaleDateString(),
+    shareCreditDate: new Date().toLocaleDateString(),
     refundDate: new Date().toLocaleDateString(),
     listingDate: new Date().toLocaleDateString(),
     logo: '',
