@@ -2,7 +2,8 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 // routers
-const { scrapChittor } = require('./handlers/scrapChittor');
+const { scrap: chittorgrah } = require('./scrapper/chittorgrah');
+const { scrap: companyCodes } = require('./scrapper/companyCode');
 
 // database connection
 // require('./dbConnection');
@@ -15,7 +16,8 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/scrap/:title/:id', scrapChittor);
+app.get('/scrap/:title/:id', chittorgrah);
+app.get('/company-codes', companyCodes);
 
 app.listen(process.env.PORT || 3000, (err, _) => {
   if (err) {

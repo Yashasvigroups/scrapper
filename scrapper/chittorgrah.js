@@ -1,6 +1,6 @@
 const { default: puppeteer } = require('puppeteer');
 
-async function scrapChittor(req, res) {
+async function scrap(req, res) {
   const { title, id } = req.params;
   const response = {
     lotSize: '',
@@ -408,4 +408,4 @@ function getPromoters() {
   return promoters;
 }
 
-module.exports = { scrapChittor };
+module.exports = { scrap };
