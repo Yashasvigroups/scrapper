@@ -1,18 +1,4 @@
-const REGISTRAR = {
-  CAMEO: 'CAMEO',
-  MAASHITLA: 'MAASHITLA',
-  BIGSHARE: 'BIGSHARE',
-  LINKINTIME: 'LINKINTIME',
-  KFINTECH: 'KFINTECH',
-};
-
-const SCRAP_URL = {
-  CAMEO: 'https://ipostatus3.cameoindia.com:3000/api/1.0/ipostatus',
-  MAASHITLA: 'https://maashitla.com/PublicIssues/Search',
-  BIGSHARE: 'https://ipo.bigshareonline.com/Data.aspx/FetchIpodetails',
-  LINKINTIME: 'https://in.mpms.mufg.com/Initial_Offer/IPO.aspx/SearchOnPan',
-  KFINTECH: 'https://kosmic.kfintech.com/ipostatus/',
-};
+const KFINTECH = 'https://kosmic.kfintech.com/ipostatus/';
 
 const KFINTECH_SELECTOR = {
   IPO_SELECT: 'select#ddl_ipo',
@@ -27,7 +13,6 @@ const KFINTECH_SELECTOR = {
 };
 
 module.exports = {
-  REGISTRAR,
-  SCRAP_URL,
   KFINTECH_SELECTOR,
+  KFINTECH,
 };
