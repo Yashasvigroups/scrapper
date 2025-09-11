@@ -78,11 +78,6 @@ async function scrapChittor(req, res) {
       page.evaluate(getDates),
       page.evaluate(getPromoters),
     ]);
-    await subscriptionPage.goto(subscriptionUrl);
-    await subscriptionPage.waitForSelector(
-      '#main > div:nth-child(3) > div:nth-child(2)'
-    );
-    const offered = await subscriptionPage.evaluate(getOffered);
     response.logo = logo;
     response.faceValue = faceValue;
     response.lotSize = lotSize;
@@ -99,17 +94,6 @@ async function scrapChittor(req, res) {
     response.email = address.email;
     response.website = address.website;
     response.managers = leadManagers;
-    response.qib = offered.qib;
-    if (!offered.nibat || !offered.nibbt) {
-      response.nibat = offered.nii;
-      response.nibbt = offered.nii;
-    } else {
-      response.nibat = offered.nibat;
-      response.nibbt = offered.nibbt;
-    }
-    response.retail = offered.retail;
-    response.employee = offered.employee;
-    response.shareHolders = offered.shareHolders;
     response.report = report.arr;
     response.amountIn = report.amountIn;
     response.allotmentDate = dates.allotmentDate;
@@ -117,12 +101,40 @@ async function scrapChittor(req, res) {
     response.sharesCreditDate = dates.sharesCreditDate;
     response.listingDate = dates.listingDate;
     response.promoters = promoters;
-
-    res.status(200).json(response);
+    // getting subscription page details
+    try {
+      await subscriptionPage.goto(subscriptionUrl);
+      await subscriptionPage.waitForSelector(
+        '#main > div:nth-child(3) > div:nth-child(2)',
+        {
+          timeout: 5000,
+        }
+      );
+      const offered = await subscriptionPage.evaluate(getOffered);
+      response.qib = offered.qib || 0;
+      if (!offered.nibat || !offered.nibbt) {
+        response.nibat = offered.nii || 0;
+        response.nibbt = offered.nii || 0;
+      } else {
+        response.nibat = offered.nibat;
+        response.nibbt = offered.nibbt;
+      }
+      response.retail = offered.retail || 0;
+      response.employee = offered.employee || 0;
+      response.shareHolders = offered.shareHolders || 0;
+    } catch (err) {
+      response.qib = 0;
+      response.nibat = 0;
+      response.nibbt = 0;
+      response.retail = 0;
+      response.employee = 0;
+      response.shareHolders = 0;
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json('internal server error');
   } finally {
+    res.status(200).json(response);
     await browser.close();
   }
   return;
