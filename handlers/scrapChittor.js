@@ -12,6 +12,8 @@ async function scrapChittor(req, res) {
     nibat: '',
     nibbt: '',
     retail: '',
+    employee: '',
+    shareHolders: '',
     address: '',
     email: '',
     contact: '',
@@ -22,7 +24,7 @@ async function scrapChittor(req, res) {
     promoters: '',
     amountIn: '',
     allotmentDate: new Date().toLocaleDateString(),
-    shareCreditDate: new Date().toLocaleDateString(),
+    sharesCreditDate: new Date().toLocaleDateString(),
     refundDate: new Date().toLocaleDateString(),
     listingDate: new Date().toLocaleDateString(),
     logo: '',
@@ -32,11 +34,14 @@ async function scrapChittor(req, res) {
     report: [],
   };
   let url = 'https://www.chittorgarh.com/ipo/' + title + '/' + id;
+  let subscriptionUrl =
+    'https://www.chittorgarh.com/ipo_subscription/' + title + '/' + id;
   const browser = await puppeteer.launch({
     headers: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
   const page = await browser.newPage();
+  const subscriptionPage = await browser.newPage();
   try {
     await page.goto(url);
     await page.waitForSelector('img.img-fluid');
@@ -52,7 +57,7 @@ async function scrapChittor(req, res) {
       pERatio,
       address,
       leadManagers,
-      offered,
+      // offered,
       report,
       dates,
       promoters,
@@ -68,11 +73,16 @@ async function scrapChittor(req, res) {
       page.evaluate(getPERatio),
       page.evaluate(getAddress),
       page.evaluate(getLeadManagers),
-      page.evaluate(getOffered),
+      // page.evaluate(getOffered),
       page.evaluate(getReport),
       page.evaluate(getDates),
       page.evaluate(getPromoters),
     ]);
+    await subscriptionPage.goto(subscriptionUrl);
+    await subscriptionPage.waitForSelector(
+      '#main > div:nth-child(3) > div:nth-child(2)'
+    );
+    const offered = await subscriptionPage.evaluate(getOffered);
     response.logo = logo;
     response.faceValue = faceValue;
     response.lotSize = lotSize;
@@ -90,9 +100,16 @@ async function scrapChittor(req, res) {
     response.website = address.website;
     response.managers = leadManagers;
     response.qib = offered.qib;
-    response.nibat = offered.nibat;
-    response.nibbt = offered.nibbt;
+    if (!offered.nibat || !offered.nibbt) {
+      response.nibat = offered.nii;
+      response.nibbt = offered.nii;
+    } else {
+      response.nibat = offered.nibat;
+      response.nibbt = offered.nibbt;
+    }
     response.retail = offered.retail;
+    response.employee = offered.employee;
+    response.shareHolders = offered.shareHolders;
     response.report = report.arr;
     response.amountIn = report.amountIn;
     response.allotmentDate = dates.allotmentDate;
@@ -143,54 +160,71 @@ function getLinks() {
 
 function getLotSize() {
   const ele = document.querySelectorAll('table');
+  let size = 0;
   if (ele.length >= 1) {
-    const element = ele[1].querySelector(
-      'tr:nth-child(5) > td:nth-child(2)'
-    )?.innerText;
-    if (element?.toLowerCase()?.includes(' shares')) {
-      return element?.split(' Shares')[0];
-    }
+    ele[1].querySelectorAll('tr')?.forEach((v) => {
+      if (
+        v.innerText?.toLowerCase()?.includes('lot size') &&
+        v.children?.length > 0
+      ) {
+        let s = v.children[1]?.innerText.replaceAll(',', '');
+        if (s) {
+          size = parseInt(s);
+        }
+      }
+    });
   }
-  return 0;
+  return size;
 }
 
 function getFaceValue() {
   const ele = document.querySelectorAll('table');
+  let size = 0;
   if (ele.length >= 1) {
-    const element = ele[1].querySelector(
-      'tr:nth-child(3) > td:nth-child(2)'
-    )?.innerText;
-    if (element?.toLowerCase()?.includes(' per share')) {
-      return element?.split(' per share')[0]?.split('₹')[1];
-    }
+    ele[1].querySelectorAll('tr')?.forEach((v) => {
+      if (
+        v.innerText?.toLowerCase()?.includes('face value') &&
+        v.children?.length > 0
+      ) {
+        let s = v.children[1]?.innerText.replaceAll('₹', '');
+        if (s) {
+          size = parseInt(s);
+        }
+      }
+    });
   }
-  return 0;
+  return size;
 }
 
 function getIssueSize() {
   const ele = document.querySelectorAll('table');
+  let sz = '';
   if (ele.length >= 1) {
-    const element = ele[1].querySelector(
-      'tr:nth-child(7) > td:nth-child(2)'
-    )?.innerText;
-    if (element?.toLowerCase()?.includes(' shares')) {
-      return element?.split(' shares')[0]?.replaceAll(',', '');
-    }
+    ele[1].querySelector('tbody')?.childNodes?.forEach((v) => {
+      if (v?.innerText?.toLowerCase()?.includes('issue size')) {
+        let s = v.innerText.split('₹');
+        if (s && s.length > 0) {
+          sz = s[1]?.slice(0, -1);
+        }
+      }
+    });
   }
-  return 0;
+  return sz;
 }
 
 function getPriceBand() {
   const ele = document.querySelectorAll('table');
+  let size = '';
   if (ele.length >= 1) {
-    const element = ele[1].querySelector(
-      'tr:nth-child(4) > td:nth-child(2)'
-    )?.innerText;
-    if (element?.toLowerCase()?.includes(' per share')) {
-      return element?.split(' per share')[0];
-    }
+    ele[1].querySelectorAll('tr')?.forEach((v) => {
+      if (v.innerText?.toLowerCase()?.includes('price band')) {
+        if (v.children?.length > 0) {
+          size = v.children[1]?.innerText;
+        }
+      }
+    });
   }
-  return 0;
+  return size;
 }
 
 function getAbout() {
@@ -249,60 +283,41 @@ function getLeadManagers() {
 }
 
 function getOffered() {
-  function rp(str) {
-    return str?.split(' ')[0]?.replaceAll(',', '');
+  const offered = {};
+  const element = document.querySelectorAll('tbody');
+  if (element.length > 1) {
+    element[1].querySelectorAll('tr')?.forEach((v) => {
+      let label = v?.innerText?.toLowerCase() || '';
+      if (
+        (label.includes('qib') || label.includes('qualified')) &&
+        v?.children?.length > 2
+      ) {
+        offered.qib = v?.children[2]?.innerText?.replaceAll(',', '');
+      }
+      if (label.includes('bnii') && v?.children?.length > 2) {
+        offered.nibat = v?.children[2]?.innerText?.replaceAll(',', '');
+      }
+      if (label.includes('snii') && v?.children?.length > 2) {
+        offered.nibbt = v?.children[2]?.innerText?.replaceAll(',', '');
+      }
+      if (label.includes('buyers') && v?.children?.length > 2) {
+        offered.nii = v?.children[2]?.innerText?.replaceAll(',', '');
+      }
+      if (
+        (label.includes('retail') || label.includes('individual')) &&
+        v?.children?.length > 2
+      ) {
+        offered.retail = v?.children[2]?.innerText?.replaceAll(',', '');
+      }
+      if (label.includes('employee') && v?.children?.length > 2) {
+        offered.employee = v?.children[2]?.innerText?.replaceAll(',', '');
+      }
+      if (label.includes('holders') && v?.children?.length > 2) {
+        offered.shareHolders = v?.children[2]?.innerText?.replaceAll(',', '');
+      }
+    });
   }
-  const obj = {
-    qib: 0,
-    nibat: 0,
-    nibbt: 0,
-    retail: 0,
-  };
-  const ele = document.querySelectorAll('table');
-  if (ele.length < 3) {
-    return obj;
-  }
-  const element = ele[2];
-  element?.childNodes?.forEach((v) => {
-    if (
-      v.nodeName == 'TBODY' &&
-      v.className.includes('collaps') &&
-      v.id == 'nii-details-toggle'
-    ) {
-      // handle tr niibt, niiat
-      v?.childNodes?.forEach((tr) => {
-        if (tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('bnii')) {
-          obj.nibat = rp(tr?.childNodes[1]?.innerText);
-        } else if (
-          tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('snii')
-        ) {
-          obj.nibbt = rp(tr?.childNodes[1]?.innerText);
-        }
-      });
-    } else if (v.nodeName == 'TBODY' && v.className?.includes('collaps')) {
-      // skip QIB collapsable
-    } else if (v.nodeName == 'TBODY') {
-      // handle retail, employee and other
-      v?.childNodes?.forEach((tr) => {
-        if (tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('retail')) {
-          obj.retail = rp(tr?.childNodes[1]?.innerText);
-        } else if (
-          tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('qib')
-        ) {
-          obj.qib = rp(tr?.childNodes[1]?.innerText);
-        } else if (
-          tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('bnii')
-        ) {
-          obj.nibat = rp(tr?.childNodes[1]?.innerText);
-        } else if (
-          tr?.childNodes[0]?.innerText?.toLowerCase()?.includes('snii')
-        ) {
-          obj.nibbt = rp(tr?.childNodes[1]?.innerText);
-        }
-      });
-    }
-  });
-  return obj;
+  return offered;
 }
 
 function getReport() {
