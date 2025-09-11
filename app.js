@@ -2,9 +2,6 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 // routers
-// const companyRouter = require('./routers/company.router');
-// const allotmentRouter = require('./routers/allotment.router');
-const { checkBatchAllotment } = require('./handlers/checkAllotments');
 const { scrapChittor } = require('./handlers/scrapChittor');
 
 // database connection
@@ -14,18 +11,10 @@ const { scrapChittor } = require('./handlers/scrapChittor');
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 const app = express();
-app.use(
-  cors({
-    origin: '*',
-  })
-);
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// only using company and allotment routers for now
-// app.use('', companyRouter);
-// app.use('', allotmentRouter);
-app.post('/checkBatch', checkBatchAllotment);
 app.get('/scrap/:title/:id', scrapChittor);
 
 app.listen(process.env.PORT || 3000, (err, _) => {
