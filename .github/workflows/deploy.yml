@@ -1,0 +1,44 @@
+name: build and deploy
+description: Build after pulling latest code from main and deploy to server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build and Deploy to GitHub Container Repo
+        run: |
+          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u yinvest --password-stdin
+          echo "Building Image Now-----------------------"
+          docker build -t ghcr.io/yashasvigroups/scrapper:latest .
+          echo "Pushing Image----------------------------"
+          docker push ghcr.io/yashasvigroups/scrapper:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          passphrase: ${{ secrets.DROPLET_SSH_PASSPHRASE }}
+          script: |
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u yinvest --password-stdin
+            echo "Pulling latest image-------------------"
+            docker pull ghcr.io/yashasvigroups/scrapper:latest
+            docker stop scrapper || true
+            docker rm scrapper || true
+            echo "Restarting image-----------------------"
+            docker run -d --pull always --restart always \
+            --name scrapper -p 3002:3002 \
+            ghcr.io/yashasvigroups/scrapper:latest
