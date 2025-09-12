@@ -4,9 +4,12 @@ const { SCRAP_URL } = require('../static/static');
 async function scrap(_, res) {
   const browser = await puppeteer.launch({
     headless: false, // try non-headless first to debug
+    // executablePath: '/usr/bin/chromium',
     args: [
-      '--disable-features=IsolateOrigins',
-      '--disable-site-isolation-trials',
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--window-size=1280,720',
     ],
   });
 
@@ -151,6 +154,9 @@ async function ScrapperLinkintime(browser) {
 
 async function ScrapperKfintech(browser) {
   const page = await browser.newPage();
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, 'webdriver', { get: () => false });
+  });
   await page.goto(SCRAP_URL.KFINTECH, { waitUntil: 'networkidle2' });
 
   await page.waitForSelector('.content', { timeout: 30000 });

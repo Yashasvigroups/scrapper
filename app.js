@@ -19,10 +19,10 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/scrap/:title/:id', chittorgrah);
 app.get('/company-codes', companyCodes);
 
-app.listen(process.env.PORT || 3000, (err, _) => {
+app.listen(process.env.PORT || 3002, (err, _) => {
   if (err) {
     console.log('Error initiating server');
     return;
   }
-  console.log(`Server listening on ${process.env.PORT || 3000}`);
+  console.log(`Server listening on ${process.env.PORT || 3002}`);
 });
