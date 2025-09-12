@@ -12,7 +12,30 @@ const KFINTECH_SELECTOR = {
   POPUP_CONTENT: '.jconfirm-content',
 };
 
+const REGISTRAR = {
+  CAMEO: 'CAMEO',
+  MAASHITLA: 'MAASHITLA',
+  BIGSHARE: 'BIGSHARE',
+  LINKINTIME: 'LINKINTIME',
+  KFINTECH: 'KFINTECH',
+  SKYLINE: 'SKYLINE',
+  PURVA: 'PURVA',
+};
+
+const SCRAP_URL = {
+  CAMEO: 'https://ipostatus1.cameoindia.com/',
+  MAASHITLA: 'https://maashitla.com/allotment-status/public-issues',
+  BIGSHARE: 'https://ipo.bigshareonline.com/IPO_Status.html',
+  // LINKINTIME: 'https://in.mpms.mufg.com/Initial_Offer/IPO.aspx/GetDetails',
+  LINKINTIME: 'https://in.mpms.mufg.com/Initial_Offer/public-issues.html',
+  KFINTECH: 'https://ipostatus.kfintech.com/',
+  SKYLINE: 'https://www.skylinerta.com/ipo.php',
+  PURVA: '',
+};
+
 module.exports = {
   KFINTECH_SELECTOR,
   KFINTECH,
+  REGISTRAR,
+  SCRAP_URL,
 };
