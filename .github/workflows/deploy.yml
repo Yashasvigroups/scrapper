@@ -23,6 +23,7 @@ jobs:
           docker push ghcr.io/yashasvigroups/scrapper:latest
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to Server
