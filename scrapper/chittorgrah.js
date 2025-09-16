@@ -177,24 +177,27 @@ async function scrap(req, res) {
       console.log('failed ', 'report');
     }
     // SUBSCRIPTION
-    console.log('2');
     await subscriptionPage.goto(subscriptionUrl);
-    await subscriptionPage.waitForSelector(
-      '#main > div:nth-child(3) > div:nth-child(2)',
-      { timeout: 20000 }
-    );
-    const offered = await subscriptionPage.evaluate(getOffered);
-    response.qib = offered.qib || 0;
-    if (!offered.nibat || !offered.nibbt) {
-      response.nibat = offered.nii || 0;
-      response.nibbt = offered.nii || 0;
-    } else {
-      response.nibat = offered.nibat;
-      response.nibbt = offered.nibbt;
+    const [res] = await Promise.allSettled([
+      subscriptionPage.waitForSelector(
+        '#main > div:nth-child(3) > div:nth-child(2)',
+        { timeout: 20000 }
+      ),
+    ]);
+    if (res.status == 'fulfilled') {
+      const offered = await subscriptionPage.evaluate(getOffered);
+      response.qib = offered.qib || 0;
+      if (!offered.nibat || !offered.nibbt) {
+        response.nibat = offered.nii || 0;
+        response.nibbt = offered.nii || 0;
+      } else {
+        response.nibat = offered.nibat;
+        response.nibbt = offered.nibbt;
+      }
+      response.retail = offered.retail || 0;
+      response.employee = offered.employee || 0;
+      response.shareHolders = offered.shareHolders || 0;
     }
-    response.retail = offered.retail || 0;
-    response.employee = offered.employee || 0;
-    response.shareHolders = offered.shareHolders || 0;
     res.status(200).json(response);
   } catch (err) {
     console.error(err);
