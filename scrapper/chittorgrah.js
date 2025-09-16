@@ -63,7 +63,7 @@ async function scrap(req, res) {
       report,
       dates,
       promoters,
-    ] = await Promise.all([
+    ] = await Promise.allSettled([
       page.evaluate(getLogo),
       page.evaluate(getFaceValue),
       page.evaluate(getLotSize),
@@ -80,64 +80,111 @@ async function scrap(req, res) {
       page.evaluate(getDates),
       page.evaluate(getPromoters),
     ]);
-    response.logo = logo;
-    response.faceValue = faceValue;
-    response.lotSize = lotSize;
-    response.drhp = links.drhp;
-    response.rhp = links.rhp;
-    response.anchor = links.anchor;
-    response.issueSize = issueSize;
-    response.priceBand = priceBand;
-    response.about = about;
-    response.objective = objective;
-    response.peRatio = pERatio;
-    response.address = address.address;
-    response.contact = address.phone;
-    response.email = address.email;
-    response.website = address.website;
-    response.managers = leadManagers;
-    response.report = report.arr;
-    response.amountIn = report.amountIn;
-    response.allotmentDate = dates.allotmentDate;
-    response.refundDate = dates.refundDate;
-    response.sharesCreditDate = dates.sharesCreditDate;
-    response.listingDate = dates.listingDate;
-    response.promoters = promoters;
-    // getting subscription page details
-    try {
-      await subscriptionPage.goto(subscriptionUrl);
-      await subscriptionPage.waitForSelector(
-        '#main > div:nth-child(3) > div:nth-child(2)',
-        { timeout: 5000 }
-      );
-      const offered = await subscriptionPage.evaluate(getOffered);
-      response.qib = offered.qib || 0;
-      if (!offered.nibat || !offered.nibbt) {
-        response.nibat = offered.nii || 0;
-        response.nibbt = offered.nii || 0;
-      } else {
-        response.nibat = offered.nibat;
-        response.nibbt = offered.nibbt;
-      }
-      response.retail = offered.retail || 0;
-      response.employee = offered.employee || 0;
-      response.shareHolders = offered.shareHolders || 0;
-    } catch (err) {
-      response.qib = 0;
-      response.nibat = 0;
-      response.nibbt = 0;
-      response.retail = 0;
-      response.employee = 0;
-      response.shareHolders = 0;
+    if (logo.status == 'fulfilled') {
+      response.logo = logo.value;
+    } else {
+      console.log('failed ', 'logo');
     }
+    if (faceValue.status == 'fulfilled') {
+      response.faceValue = faceValue.value;
+    } else {
+      console.log('failed ', 'faceValue');
+    }
+    if (lotSize.status == 'fulfilled') {
+      response.lotSize = lotSize.value;
+    } else {
+      console.log('failed ', 'lotSize');
+    }
+    if (issueSize.status == 'fulfilled') {
+      response.issueSize = issueSize.value;
+    } else {
+      console.log('failed ', 'issueSize');
+    }
+    if (priceBand.status == 'fulfilled') {
+      response.priceBand = priceBand.value;
+    } else {
+      console.log('failed ', 'priceBand');
+    }
+    if (about.status == 'fulfilled') {
+      response.about = about.value;
+    } else {
+      console.log('failed ', 'about');
+    }
+    if (objective.status == 'fulfilled') {
+      response.objective = objective.value;
+    } else {
+      console.log('failed ', 'objective');
+    }
+    if (pERatio.status == 'fulfilled') {
+      response.peRatio = pERatio.value;
+    } else {
+      console.log('failed ', 'pERatio');
+    }
+    if (leadManagers.status == 'fulfilled') {
+      response.managers = leadManagers.value;
+    } else {
+      console.log('failed ', 'leadManagers');
+    }
+    if (promoters.status == 'fulfilled') {
+      response.promoters = promoters.value;
+    } else {
+      console.log('failed ', 'promoters');
+    }
+    if (links.status == 'fulfilled') {
+      response.drhp = links.value.drhp;
+      response.rhp = links.value.rhp;
+      response.anchor = links.value.anchor;
+    } else {
+      console.log('failed ', 'links');
+    }
+    if (address.status == 'fulfilled') {
+      response.address = address.value.address;
+      response.contact = address.value.phone;
+      response.email = address.value.email;
+      response.website = address.value.website;
+    } else {
+      console.log('failed ', 'address');
+    }
+    if (dates.status == 'fulfilled') {
+      response.allotmentDate = dates.value.allotmentDate;
+      response.refundDate = dates.value.refundDate;
+      response.sharesCreditDate = dates.value.sharesCreditDate;
+      response.listingDate = dates.value.listingDate;
+    } else {
+      console.log('failed ', 'dates');
+    }
+    if (report.status == 'fulfilled') {
+      response.report = report.value.arr;
+      response.amountIn = report.value.amountIn;
+    } else {
+      console.log('failed ', 'report');
+    }
+    // SUBSCRIPTION
+    console.log('2');
+    await subscriptionPage.goto(subscriptionUrl);
+    await subscriptionPage.waitForSelector(
+      '#main > div:nth-child(3) > div:nth-child(2)',
+      { timeout: 20000 }
+    );
+    const offered = await subscriptionPage.evaluate(getOffered);
+    response.qib = offered.qib || 0;
+    if (!offered.nibat || !offered.nibbt) {
+      response.nibat = offered.nii || 0;
+      response.nibbt = offered.nii || 0;
+    } else {
+      response.nibat = offered.nibat;
+      response.nibbt = offered.nibbt;
+    }
+    response.retail = offered.retail || 0;
+    response.employee = offered.employee || 0;
+    response.shareHolders = offered.shareHolders || 0;
+    res.status(200).json(response);
   } catch (err) {
     console.error(err);
     res.status(500).json('internal server error');
   } finally {
-    res.status(200).json(response);
     await browser.close();
   }
-  return;
 }
 
 function getLogo() {
