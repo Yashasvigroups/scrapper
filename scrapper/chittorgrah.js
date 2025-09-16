@@ -178,13 +178,13 @@ async function scrap(req, res) {
     }
     // SUBSCRIPTION
     await subscriptionPage.goto(subscriptionUrl);
-    const [res] = await Promise.allSettled([
+    const [resp] = await Promise.allSettled([
       subscriptionPage.waitForSelector(
         '#main > div:nth-child(3) > div:nth-child(2)',
         { timeout: 20000 }
       ),
     ]);
-    if (res.status == 'fulfilled') {
+    if (resp.status == 'fulfilled') {
       const offered = await subscriptionPage.evaluate(getOffered);
       response.qib = offered.qib || 0;
       if (!offered.nibat || !offered.nibbt) {
