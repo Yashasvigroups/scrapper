@@ -40,8 +40,10 @@ async function scrap(req, res) {
     headers: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
-  const page = await browser.newPage();
-  const subscriptionPage = await browser.newPage();
+  const [page, subscriptionPage] = await Promise.all([
+    browser.newPage(),
+    browser.newPage(),
+  ]);
   try {
     await page.goto(url);
     await page.waitForSelector('img.img-fluid');
@@ -106,9 +108,7 @@ async function scrap(req, res) {
       await subscriptionPage.goto(subscriptionUrl);
       await subscriptionPage.waitForSelector(
         '#main > div:nth-child(3) > div:nth-child(2)',
-        {
-          timeout: 5000,
-        }
+        { timeout: 5000 }
       );
       const offered = await subscriptionPage.evaluate(getOffered);
       response.qib = offered.qib || 0;
@@ -142,9 +142,11 @@ async function scrap(req, res) {
 
 function getLogo() {
   const images = document.querySelectorAll('img.img-fluid');
-  const withTitle = Array.from(images).filter((v) => v.getAttribute('title'));
-  if (withTitle?.length > 0) {
-    return withTitle[0].src;
+  if (images) {
+    const withTitle = Array.from(images).filter((v) => v.getAttribute('title'));
+    if (withTitle?.length > 0) {
+      return withTitle[0].src;
+    }
   }
   return '';
 }
@@ -174,12 +176,12 @@ function getLotSize() {
   const ele = document.querySelectorAll('table');
   let size = 0;
   if (ele.length >= 1) {
-    ele[1].querySelectorAll('tr')?.forEach((v) => {
+    ele[1]?.querySelectorAll('tr')?.forEach((v) => {
       if (
-        v.innerText?.toLowerCase()?.includes('lot size') &&
-        v.children?.length > 0
+        v?.innerText?.toLowerCase()?.includes('lot size') &&
+        v?.children?.length > 0
       ) {
-        let s = v.children[1]?.innerText.replaceAll(',', '');
+        let s = v?.children[1]?.innerText.replaceAll(',', '');
         if (s) {
           size = parseInt(s);
         }
@@ -192,13 +194,13 @@ function getLotSize() {
 function getFaceValue() {
   const ele = document.querySelectorAll('table');
   let size = 0;
-  if (ele.length >= 1) {
+  if (ele?.length >= 1) {
     ele[1].querySelectorAll('tr')?.forEach((v) => {
       if (
-        v.innerText?.toLowerCase()?.includes('face value') &&
-        v.children?.length > 0
+        v?.innerText?.toLowerCase()?.includes('face value') &&
+        v?.children?.length > 0
       ) {
-        let s = v.children[1]?.innerText.replaceAll('₹', '');
+        let s = v?.children[1]?.innerText?.replaceAll('₹', '');
         if (s) {
           size = parseInt(s);
         }
@@ -212,9 +214,9 @@ function getIssueSize() {
   const ele = document.querySelectorAll('table');
   let sz = '';
   if (ele.length >= 1) {
-    ele[1].querySelector('tbody')?.childNodes?.forEach((v) => {
+    ele[1]?.querySelector('tbody')?.childNodes?.forEach((v) => {
       if (v?.innerText?.toLowerCase()?.includes('issue size')) {
-        let s = v.innerText.split('₹');
+        let s = v?.innerText.split('₹');
         if (s && s.length > 0) {
           sz = s[1]?.slice(0, -1);
         }
@@ -227,30 +229,34 @@ function getIssueSize() {
 function getPriceBand() {
   const ele = document.querySelectorAll('table');
   let size = '';
-  if (ele.length >= 1) {
-    ele[1].querySelectorAll('tr')?.forEach((v) => {
-      if (v.innerText?.toLowerCase()?.includes('price band')) {
-        if (v.children?.length > 0) {
-          size = v.children[1]?.innerText;
+  if (ele?.length >= 1) {
+    ele[1]?.querySelectorAll('tr')?.forEach((v) => {
+      if (v?.innerText?.toLowerCase()?.includes('price band')) {
+        if (v?.children?.length > 0) {
+          size = v?.children[1]?.innerText;
         }
       }
     });
   }
-  return size;
+  return size || '';
 }
 
 function getAbout() {
   const elements = document.querySelector('#ipoSummary');
-  return Array.from(elements?.children || [])
-    ?.map((v) => v?.innerText)
-    ?.join(' \n\n');
+  return (
+    Array.from(elements?.children || [])
+      ?.map((v) => v?.innerText)
+      ?.join(' \n\n') || ''
+  );
 }
 
 function getObjective() {
   const element = document.querySelector('#ObjectiveIssue > tbody');
-  return Array.from(element?.childNodes || [])
-    ?.map((v) => v.childNodes[3].innerText)
-    ?.join(' \n\n');
+  return (
+    Array.from(element?.childNodes || [])
+      ?.map((v) => v?.childNodes[3]?.innerText)
+      ?.join(' \n\n') || ''
+  );
 }
 
 function getPERatio() {
@@ -285,7 +291,7 @@ function getAddress() {
 function getLeadManagers() {
   const element =
     document.querySelector('#recommendation')?.parentElement?.childNodes;
-  if (element.length >= 1) {
+  if (element?.length >= 1) {
     const ol = element[1]?.querySelector('ol');
     return Array.from(ol?.childNodes || [])
       ?.map((v) => v?.querySelector('a')?.innerText)
@@ -297,34 +303,34 @@ function getLeadManagers() {
 function getOffered() {
   const offered = {};
   const element = document.querySelectorAll('tbody');
-  if (element.length > 1) {
-    element[1].querySelectorAll('tr')?.forEach((v) => {
+  if (element?.length > 1) {
+    element[1]?.querySelectorAll('tr')?.forEach((v) => {
       let label = v?.innerText?.toLowerCase() || '';
       if (
-        (label.includes('qib') || label.includes('qualified')) &&
+        (label?.includes('qib') || label?.includes('qualified')) &&
         v?.children?.length > 2
       ) {
         offered.qib = v?.children[2]?.innerText?.replaceAll(',', '');
       }
-      if (label.includes('bnii') && v?.children?.length > 2) {
+      if (label?.includes('bnii') && v?.children?.length > 2) {
         offered.nibat = v?.children[2]?.innerText?.replaceAll(',', '');
       }
-      if (label.includes('snii') && v?.children?.length > 2) {
+      if (label?.includes('snii') && v?.children?.length > 2) {
         offered.nibbt = v?.children[2]?.innerText?.replaceAll(',', '');
       }
-      if (label.includes('buyers') && v?.children?.length > 2) {
+      if (label?.includes('buyers') && v?.children?.length > 2) {
         offered.nii = v?.children[2]?.innerText?.replaceAll(',', '');
       }
       if (
-        (label.includes('retail') || label.includes('individual')) &&
+        (label?.includes('retail') || label?.includes('individual')) &&
         v?.children?.length > 2
       ) {
         offered.retail = v?.children[2]?.innerText?.replaceAll(',', '');
       }
-      if (label.includes('employee') && v?.children?.length > 2) {
+      if (label?.includes('employee') && v?.children?.length > 2) {
         offered.employee = v?.children[2]?.innerText?.replaceAll(',', '');
       }
-      if (label.includes('holders') && v?.children?.length > 2) {
+      if (label?.includes('holders') && v?.children?.length > 2) {
         offered.shareHolders = v?.children[2]?.innerText?.replaceAll(',', '');
       }
     });
@@ -335,20 +341,20 @@ function getOffered() {
 function getReport() {
   const element = document.querySelector('#financialTable > tbody');
   const rows = Array.from(element?.childNodes || []);
-  rows.splice(4);
+  rows?.splice(4);
   const arr = [];
   rows?.forEach((v, i) => {
     v?.childNodes?.forEach((d, j) => {
       if (j == 0) return;
 
       if (i == 0) {
-        arr.push({ year: d.innerText.split(' ')[2] });
+        arr.push({ year: d?.innerText.split(' ')[2] });
       } else if (i == 1) {
-        arr[j - 1].asset = d.innerText.replaceAll(',', '');
+        arr[j - 1].asset = d?.innerText.replaceAll(',', '');
       } else if (i == 2) {
-        arr[j - 1].revenue = d.innerText.replaceAll(',', '');
+        arr[j - 1].revenue = d?.innerText.replaceAll(',', '');
       } else {
-        arr[j - 1].pat = d.innerText.replaceAll(',', '');
+        arr[j - 1].pat = d?.innerText.replaceAll(',', '');
       }
     });
   });
@@ -367,29 +373,29 @@ function getDates() {
   ele.forEach((element) => {
     if (element.innerText?.includes('Tentative Allotment')) {
       element = element.querySelector('tbody');
-      element.childNodes.forEach((v) => {
-        if (v.childNodes.length == 0) {
+      element?.childNodes?.forEach((v) => {
+        if (v?.childNodes?.length == 0) {
           return;
         }
-        const label = v.childNodes[0]?.innerText?.toLowerCase();
+        const label = v?.childNodes[0]?.innerText?.toLowerCase();
         if (label?.includes('allotment')) {
           dates.allotmentDate = new Date(
-            v.childNodes[1]?.innerText
+            v?.childNodes[1]?.innerText
           ).toLocaleDateString();
         }
         if (label?.includes('credit')) {
           dates.sharesCreditDate = new Date(
-            v.childNodes[1]?.innerText
+            v?.childNodes[1]?.innerText
           ).toLocaleDateString();
         }
         if (label?.includes('refund')) {
           dates.refundDate = new Date(
-            v.childNodes[1]?.innerText
+            v?.childNodes[1]?.innerText
           ).toLocaleDateString();
         }
         if (label?.includes('listing')) {
           dates.listingDate = new Date(
-            v.childNodes[1]?.innerText
+            v?.childNodes[1]?.innerText
           ).toLocaleDateString();
         }
       });
@@ -400,9 +406,9 @@ function getDates() {
 
 function getPromoters() {
   let promoters = '';
-  document.querySelectorAll('h2').forEach((v) => {
-    if (v.innerText?.includes('Holding')) {
-      promoters = v.nextElementSibling.innerText;
+  document.querySelectorAll('h2')?.forEach((v) => {
+    if (v?.innerText?.includes('Holding')) {
+      promoters = v?.nextElementSibling.innerText;
     }
   });
   return promoters;
