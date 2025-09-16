@@ -47,6 +47,9 @@ async function scrap(req, res) {
   try {
     await page.goto(url);
     await page.waitForSelector('img.img-fluid');
+
+    await Promise.allSettled([page.click('#splashBackURL')]);
+
     const [
       logo,
       faceValue,
@@ -82,51 +85,61 @@ async function scrap(req, res) {
     ]);
     if (logo.status == 'fulfilled') {
       response.logo = logo.value;
+      console.log('success', logo.value);
     } else {
       console.log('failed ', 'logo');
     }
     if (faceValue.status == 'fulfilled') {
       response.faceValue = faceValue.value;
+      console.log('success', faceValue.value);
     } else {
       console.log('failed ', 'faceValue');
     }
     if (lotSize.status == 'fulfilled') {
       response.lotSize = lotSize.value;
+      console.log('success', lotSize.value);
     } else {
       console.log('failed ', 'lotSize');
     }
     if (issueSize.status == 'fulfilled') {
       response.issueSize = issueSize.value;
+      console.log('success', issueSize.value);
     } else {
       console.log('failed ', 'issueSize');
     }
     if (priceBand.status == 'fulfilled') {
       response.priceBand = priceBand.value;
+      console.log('success', priceBand.value);
     } else {
       console.log('failed ', 'priceBand');
     }
     if (about.status == 'fulfilled') {
       response.about = about.value;
+      console.log('success', about.value);
     } else {
       console.log('failed ', 'about');
     }
     if (objective.status == 'fulfilled') {
       response.objective = objective.value;
+      console.log('success', objective.value);
     } else {
       console.log('failed ', 'objective');
     }
     if (pERatio.status == 'fulfilled') {
       response.peRatio = pERatio.value;
+      console.log('success', pERatio.value);
     } else {
       console.log('failed ', 'pERatio');
     }
     if (leadManagers.status == 'fulfilled') {
       response.managers = leadManagers.value;
+      console.log('success', leadManagers.value);
     } else {
       console.log('failed ', 'leadManagers');
     }
     if (promoters.status == 'fulfilled') {
       response.promoters = promoters.value;
+      console.log('success', promoters.value);
     } else {
       console.log('failed ', 'promoters');
     }
@@ -134,6 +147,7 @@ async function scrap(req, res) {
       response.drhp = links.value.drhp;
       response.rhp = links.value.rhp;
       response.anchor = links.value.anchor;
+      console.log('success', links.value);
     } else {
       console.log('failed ', 'links');
     }
@@ -142,6 +156,7 @@ async function scrap(req, res) {
       response.contact = address.value.phone;
       response.email = address.value.email;
       response.website = address.value.website;
+      console.log('success', address.value);
     } else {
       console.log('failed ', 'address');
     }
@@ -150,12 +165,14 @@ async function scrap(req, res) {
       response.refundDate = dates.value.refundDate;
       response.sharesCreditDate = dates.value.sharesCreditDate;
       response.listingDate = dates.value.listingDate;
+      console.log('success', dates.value);
     } else {
       console.log('failed ', 'dates');
     }
     if (report.status == 'fulfilled') {
       response.report = report.value.arr;
       response.amountIn = report.value.amountIn;
+      console.log('success', report.value);
     } else {
       console.log('failed ', 'report');
     }
