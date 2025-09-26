@@ -1,6 +1,6 @@
 const { default: puppeteer } = require('puppeteer');
 
-async function scrap(req, res) {
+async function chittorgrah(req, res) {
   const { title, id } = req.params;
   const response = {
     logo: '',
@@ -26,24 +26,13 @@ async function scrap(req, res) {
     listingDate: '',
     report: [],
     amountIn: '',
-    qib: 0,
-    nibat: 0,
-    nibbt: 0,
-    retail: 0,
-    employee: 0,
-    shareHolders: 0,
   };
   let url = 'https://www.chittorgarh.com/ipo/' + title + '/' + id;
-  let subscriptionUrl =
-    'https://www.chittorgarh.com/ipo_subscription/' + title + '/' + id;
   const browser = await puppeteer.launch({
     headers: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
-  const [page, subscriptionPage] = await Promise.all([
-    browser.newPage(),
-    browser.newPage(),
-  ]);
+  const page = await browser.newPage();
   try {
     await page.goto(url);
     await page.waitForSelector('img.img-fluid');
@@ -85,61 +74,51 @@ async function scrap(req, res) {
     ]);
     if (logo.status == 'fulfilled') {
       response.logo = logo.value;
-      console.log('success', logo.value);
     } else {
       console.log('failed ', 'logo');
     }
     if (faceValue.status == 'fulfilled') {
       response.faceValue = faceValue.value;
-      console.log('success', faceValue.value);
     } else {
       console.log('failed ', 'faceValue');
     }
     if (lotSize.status == 'fulfilled') {
       response.lotSize = lotSize.value;
-      console.log('success', lotSize.value);
     } else {
       console.log('failed ', 'lotSize');
     }
     if (issueSize.status == 'fulfilled') {
       response.issueSize = issueSize.value;
-      console.log('success', issueSize.value);
     } else {
       console.log('failed ', 'issueSize');
     }
     if (priceBand.status == 'fulfilled') {
       response.priceBand = priceBand.value;
-      console.log('success', priceBand.value);
     } else {
       console.log('failed ', 'priceBand');
     }
     if (about.status == 'fulfilled') {
       response.about = about.value;
-      console.log('success', about.value);
     } else {
       console.log('failed ', 'about');
     }
     if (objective.status == 'fulfilled') {
       response.objective = objective.value;
-      console.log('success', objective.value);
     } else {
       console.log('failed ', 'objective');
     }
     if (pERatio.status == 'fulfilled') {
       response.peRatio = pERatio.value;
-      console.log('success', pERatio.value);
     } else {
       console.log('failed ', 'pERatio');
     }
     if (leadManagers.status == 'fulfilled') {
       response.managers = leadManagers.value;
-      console.log('success', leadManagers.value);
     } else {
       console.log('failed ', 'leadManagers');
     }
     if (promoters.status == 'fulfilled') {
       response.promoters = promoters.value;
-      console.log('success', promoters.value);
     } else {
       console.log('failed ', 'promoters');
     }
@@ -147,7 +126,6 @@ async function scrap(req, res) {
       response.drhp = links.value.drhp;
       response.rhp = links.value.rhp;
       response.anchor = links.value.anchor;
-      console.log('success', links.value);
     } else {
       console.log('failed ', 'links');
     }
@@ -156,7 +134,6 @@ async function scrap(req, res) {
       response.contact = address.value.phone;
       response.email = address.value.email;
       response.website = address.value.website;
-      console.log('success', address.value);
     } else {
       console.log('failed ', 'address');
     }
@@ -165,17 +142,43 @@ async function scrap(req, res) {
       response.refundDate = dates.value.refundDate;
       response.sharesCreditDate = dates.value.sharesCreditDate;
       response.listingDate = dates.value.listingDate;
-      console.log('success', dates.value);
     } else {
       console.log('failed ', 'dates');
     }
     if (report.status == 'fulfilled') {
       response.report = report.value.arr;
       response.amountIn = report.value.amountIn;
-      console.log('success', report.value);
     } else {
       console.log('failed ', 'report');
     }
+    res.status(200).json(response);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json('internal server error');
+  } finally {
+    await browser.close();
+  }
+}
+
+async function subscription(req, res) {
+  const { title, id } = req.params;
+  const response = {
+    qib: 0,
+    nibat: 0,
+    nibbt: 0,
+    retail: 0,
+    employee: 0,
+    shareHolders: 0,
+  };
+  let subscriptionUrl =
+    'https://www.chittorgarh.com/ipo_subscription/' + title + '/' + id;
+  const browser = await puppeteer.launch({
+    headers: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+  const subscriptionPage = await browser.newPage();
+
+  try {
     // SUBSCRIPTION
     await subscriptionPage.goto(subscriptionUrl);
     const [resp] = await Promise.allSettled([
@@ -481,4 +484,4 @@ function getPromoters() {
   return promoters;
 }
 
-module.exports = { scrap };
+module.exports = { chittorgrah, subscription };

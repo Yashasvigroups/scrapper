@@ -5,6 +5,7 @@ async function scrap(_, res) {
   const browser = await puppeteer.launch({
     headless: false, // try non-headless first to debug
     // executablePath: '/usr/bin/chromium',
+    acceptInsecureCerts: true,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',

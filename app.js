@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 // routers
-const { scrap: chittorgrah } = require('./scrapper/chittorgrah');
+const { chittorgrah, subscription } = require('./scrapper/chittorgrah');
 const { scrap: companyCodes } = require('./scrapper/companyCode');
 
 // database connection
@@ -16,6 +16,7 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/subscription/:title/:id', subscription);
 app.get('/scrap/:title/:id', chittorgrah);
 app.get('/company-codes', companyCodes);
 
