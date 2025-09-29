@@ -16,8 +16,8 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/subscription/:title/:id', subscription);
-app.get('/scrap/:title/:id', chittorgrah);
+app.get('/scrap-subscription/:title/:id', subscription);
+app.get('/scrap-details/:title/:id', chittorgrah);
 app.get('/company-codes', companyCodes);
 
 app.listen(process.env.PORT || 3002, (err, _) => {
