@@ -41,33 +41,27 @@ async function chittorgrah(req, res) {
 
     const [
       logo,
-      faceValue,
-      lotSize,
+      firstTable,
       links,
       issueSize,
-      priceBand,
       about,
       objective,
       pERatio,
       address,
       leadManagers,
-      // offered,
       report,
       dates,
       promoters,
     ] = await Promise.allSettled([
       page.evaluate(getLogo),
-      page.evaluate(getFaceValue),
-      page.evaluate(getLotSize),
+      page.evaluate(getFirstTableDetails),
       page.evaluate(getLinks),
       page.evaluate(getIssueSize),
-      page.evaluate(getPriceBand),
       page.evaluate(getAbout),
       page.evaluate(getObjective),
       page.evaluate(getPERatio),
       page.evaluate(getAddress),
       page.evaluate(getLeadManagers),
-      // page.evaluate(getOffered),
       page.evaluate(getReport),
       page.evaluate(getDates),
       page.evaluate(getPromoters),
@@ -77,25 +71,17 @@ async function chittorgrah(req, res) {
     } else {
       console.log('failed ', 'logo');
     }
-    if (faceValue.status == 'fulfilled') {
-      response.faceValue = faceValue.value;
-    } else {
-      console.log('failed ', 'faceValue');
-    }
-    if (lotSize.status == 'fulfilled') {
-      response.lotSize = lotSize.value;
-    } else {
-      console.log('failed ', 'lotSize');
-    }
     if (issueSize.status == 'fulfilled') {
       response.issueSize = issueSize.value;
     } else {
       console.log('failed ', 'issueSize');
     }
-    if (priceBand.status == 'fulfilled') {
-      response.priceBand = priceBand.value;
+    if (firstTable.status == 'fulfilled') {
+      response.faceValue = firstTable.value.faceValue;
+      response.lotSize = firstTable.value.lotSize;
+      response.priceBand = firstTable.value.priceBand;
     } else {
-      console.log('failed ', 'priceBand');
+      console.log('failed ', 'firstTable');
     }
     if (about.status == 'fulfilled') {
       response.about = about.value;
@@ -242,44 +228,55 @@ function getLinks() {
   return obj;
 }
 
-function getLotSize() {
-  const ele = document.querySelectorAll('table');
-  let size = 0;
-  if (ele.length >= 1) {
-    ele[1]?.querySelectorAll('tr')?.forEach((v) => {
+function getFirstTableDetails() {
+  const obj = {
+    faceValue: 0,
+    priceBand: '',
+    lotSize: 0,
+  };
+  document
+    .querySelectorAll("[itemtype='http://schema.org/Table']")
+    .forEach((v) => {
       if (
-        v?.innerText?.toLowerCase()?.includes('lot size') &&
-        v?.children?.length > 0
+        v.querySelector('h2')?.innerText?.toLowerCase()?.includes('ipo details')
       ) {
-        let s = v?.children[1]?.innerText.replaceAll(',', '');
-        if (s) {
-          size = parseInt(s);
-        }
+        v.querySelectorAll('tr')?.forEach((v) => {
+          // lotsize
+          if (
+            v?.innerText?.toLowerCase()?.includes('lot size') &&
+            v?.children?.length > 0
+          ) {
+            let s = v?.children[1]?.innerText.replaceAll(',', '');
+            if (s) {
+              obj.lotSize = parseInt(s);
+            }
+          }
+          // face value
+          if (
+            v?.innerText?.toLowerCase()?.includes('face value') &&
+            v?.children?.length > 0
+          ) {
+            let s = v?.children[1]?.innerText?.replaceAll('₹', '');
+            if (s) {
+              obj.faceValue = parseInt(s);
+            }
+          }
+          // price band
+          if (
+            v?.innerText?.toLowerCase()?.includes('price band') &&
+            v?.children?.length > 0
+          ) {
+            range = v?.children[1]?.innerText?.split(' per share');
+            if (range?.length > 0) {
+              obj.priceBand = range[0];
+            }
+          }
+        });
       }
     });
-  }
-  return size;
-}
 
-function getFaceValue() {
-  const ele = document.querySelectorAll('table');
-  let size = 0;
-  if (ele?.length >= 1) {
-    ele[1].querySelectorAll('tr')?.forEach((v) => {
-      if (
-        v?.innerText?.toLowerCase()?.includes('face value') &&
-        v?.children?.length > 0
-      ) {
-        let s = v?.children[1]?.innerText?.replaceAll('₹', '');
-        if (s) {
-          size = parseInt(s);
-        }
-      }
-    });
-  }
-  return size;
+  return obj;
 }
-
 function getIssueSize() {
   const ele = document.querySelectorAll('table');
   let sz = '';
@@ -294,21 +291,6 @@ function getIssueSize() {
     });
   }
   return sz;
-}
-
-function getPriceBand() {
-  const ele = document.querySelectorAll('table');
-  let size = '';
-  if (ele?.length >= 1) {
-    ele[1]?.querySelectorAll('tr')?.forEach((v) => {
-      if (v?.innerText?.toLowerCase()?.includes('price band')) {
-        if (v?.children?.length > 0) {
-          size = v?.children[1]?.innerText;
-        }
-      }
-    });
-  }
-  return size || '';
 }
 
 function getAbout() {
