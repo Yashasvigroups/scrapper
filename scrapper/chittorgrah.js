@@ -169,7 +169,7 @@ async function subscription(req, res) {
     await subscriptionPage.goto(subscriptionUrl);
     const [resp] = await Promise.allSettled([
       subscriptionPage.waitForSelector(
-        '#main > div:nth-child(3) > div:nth-child(2)',
+        "[itemtype='https://schema.org/Table']",
         { timeout: 20000 }
       ),
     ]);
@@ -354,39 +354,39 @@ function getLeadManagers() {
 
 function getOffered() {
   const offered = {};
-  const element = document.querySelectorAll('tbody');
-  if (element?.length > 1) {
-    element[1]?.querySelectorAll('tr')?.forEach((v) => {
-      let label = v?.innerText?.toLowerCase() || '';
-      if (
-        (label?.includes('qib') || label?.includes('qualified')) &&
-        v?.children?.length > 2
-      ) {
-        offered.qib = v?.children[2]?.innerText?.replaceAll(',', '');
-      }
-      if (label?.includes('bnii') && v?.children?.length > 2) {
-        offered.nibat = v?.children[2]?.innerText?.replaceAll(',', '');
-      }
-      if (label?.includes('snii') && v?.children?.length > 2) {
-        offered.nibbt = v?.children[2]?.innerText?.replaceAll(',', '');
-      }
-      if (label?.includes('buyers') && v?.children?.length > 2) {
-        offered.nii = v?.children[2]?.innerText?.replaceAll(',', '');
-      }
-      if (
-        (label?.includes('retail') || label?.includes('individual')) &&
-        v?.children?.length > 2
-      ) {
-        offered.retail = v?.children[2]?.innerText?.replaceAll(',', '');
-      }
-      if (label?.includes('employee') && v?.children?.length > 2) {
-        offered.employee = v?.children[2]?.innerText?.replaceAll(',', '');
-      }
-      if (label?.includes('holders') && v?.children?.length > 2) {
-        offered.shareHolders = v?.children[2]?.innerText?.replaceAll(',', '');
-      }
-    });
-  }
+  const element = document.querySelector(
+    "[itemtype='https://schema.org/Table'] tbody"
+  );
+  element?.querySelectorAll('tr')?.forEach((v) => {
+    let label = v?.innerText?.toLowerCase() || '';
+    if (
+      (label?.includes('qib') || label?.includes('qualified')) &&
+      v?.children?.length > 2
+    ) {
+      offered.qib = v?.children[2]?.innerText?.replaceAll(',', '');
+    }
+    if (label?.includes('bnii') && v?.children?.length > 2) {
+      offered.nibat = v?.children[2]?.innerText?.replaceAll(',', '');
+    }
+    if (label?.includes('snii') && v?.children?.length > 2) {
+      offered.nibbt = v?.children[2]?.innerText?.replaceAll(',', '');
+    }
+    if (label?.includes('buyers') && v?.children?.length > 2) {
+      offered.nii = v?.children[2]?.innerText?.replaceAll(',', '');
+    }
+    if (
+      (label?.includes('retail') || label?.includes('individual')) &&
+      v?.children?.length > 2
+    ) {
+      offered.retail = v?.children[2]?.innerText?.replaceAll(',', '');
+    }
+    if (label?.includes('employee') && v?.children?.length > 2) {
+      offered.employee = v?.children[2]?.innerText?.replaceAll(',', '');
+    }
+    if (label?.includes('holders') && v?.children?.length > 2) {
+      offered.shareHolders = v?.children[2]?.innerText?.replaceAll(',', '');
+    }
+  });
   return offered;
 }
 
