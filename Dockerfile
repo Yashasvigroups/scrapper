@@ -1,21 +1,20 @@
-FROM node:20-slim
+# Use Puppeteer's official base image (includes Chromium + all dependencies)
+FROM ghcr.io/puppeteer/puppeteer:22.13.1
 
-# Install Chromium + Xvfb + fonts + deps
-# RUN apt-get update && apt-get install -y \
-#     chromium xvfb \
-#     fonts-liberation libatk-bridge2.0-0 libatk1.0-0 libcups2 libdrm2 \
-#     libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
-#     libgbm1 libasound2 xdg-utils \
-#     && rm -rf /var/lib/apt/lists/*
-
-# Set display for Xvfb
-# ENV DISPLAY=:99
-
+# Set working directory
 WORKDIR /app
+
+# Copy package files first (for caching)
 COPY package*.json ./
-RUN npm install
+
+# Install only production dependencies
+RUN npm ci --only=production
+
+# Copy the rest of your code
 COPY . .
+
+# Expose the port your API runs on
 EXPOSE 3002
-# Start Xvfb before running node
-# CMD ["sh", "-c", "Xvfb :99 -screen 0 1280x720x24 & node app.js"]
-CMD ["node", "app.js"]
+
+# Default command to start your API server
+CMD ["npm", "start"]
