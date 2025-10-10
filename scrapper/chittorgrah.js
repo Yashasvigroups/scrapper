@@ -149,12 +149,12 @@ async function chittorgrah(req, res) {
 async function subscription(req, res) {
   const { title, id } = req.params;
   const response = {
-    qib: 0,
-    nibat: 0,
-    nibbt: 0,
-    retail: 0,
-    employee: 0,
-    shareHolders: 0,
+    qib: '0',
+    nibat: '0',
+    nibbt: '0',
+    retail: '0',
+    employee: '0',
+    shareHolders: '0',
   };
   let subscriptionUrl =
     'https://www.chittorgarh.com/ipo_subscription/' + title + '/' + id;
@@ -175,17 +175,17 @@ async function subscription(req, res) {
     ]);
     if (resp.status == 'fulfilled') {
       const offered = await subscriptionPage.evaluate(getOffered);
-      response.qib = offered.qib || 0;
+      response.qib = offered.qib || '0';
       if (!offered.nibat || !offered.nibbt) {
-        response.nibat = offered.nii || 0;
-        response.nibbt = offered.nii || 0;
+        response.nibat = offered.nii || '0';
+        response.nibbt = offered.nii || '0';
       } else {
         response.nibat = offered.nibat;
         response.nibbt = offered.nibbt;
       }
-      response.retail = offered.retail || 0;
-      response.employee = offered.employee || 0;
-      response.shareHolders = offered.shareHolders || 0;
+      response.retail = offered.retail || '0';
+      response.employee = offered.employee || '0';
+      response.shareHolders = offered.shareHolders || '0';
     }
     res.status(200).json(response);
   } catch (err) {
