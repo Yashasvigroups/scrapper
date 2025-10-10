@@ -169,7 +169,7 @@ async function subscription(req, res) {
     await subscriptionPage.goto(subscriptionUrl);
     const [resp] = await Promise.allSettled([
       subscriptionPage.waitForSelector(
-        "[itemtype='https://schema.org/Table']",
+        "[itemtype='https://schema.org/Table'] .table-nonfluid",
         { timeout: 20000 }
       ),
     ]);
