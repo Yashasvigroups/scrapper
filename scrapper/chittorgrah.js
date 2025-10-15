@@ -10,7 +10,7 @@ async function chittorgrah(req, res) {
     priceBand: '',
     about: '',
     objective: '',
-    peRatio: '',
+    peRatio: 0,
     managers: '',
     promoters: '',
     drhp: '',
