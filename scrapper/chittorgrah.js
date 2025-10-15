@@ -316,7 +316,7 @@ function getPERatio() {
     `[data-bs-title="P/E Ratio Information"]`
   )?.parentElement?.parentElement;
   if (element && element?.childNodes?.length >= 3) {
-    return element?.childNodes[2]?.innerText;
+    return +element?.childNodes[2]?.innerText;
   }
   return 0;
 }
