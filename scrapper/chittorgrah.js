@@ -416,10 +416,10 @@ function getReport() {
 
 function getDates() {
   const dates = {
-    allotmentDate: new Date().toLocaleDateString(),
-    sharesCreditDate: new Date().toLocaleDateString(),
-    refundDate: new Date().toLocaleDateString(),
-    listingDate: new Date().toLocaleDateString(),
+    allotmentDate: new Date().toISOString().slice(0, 10),
+    sharesCreditDate: new Date().toISOString().slice(0, 10),
+    refundDate: new Date().toISOString().slice(0, 10),
+    listingDate: new Date().toISOString().slice(0, 10),
   };
   const ele = document.querySelectorAll('table');
   ele.forEach((element) => {
@@ -431,24 +431,24 @@ function getDates() {
         }
         const label = v?.childNodes[0]?.innerText?.toLowerCase();
         if (label?.includes('allotment')) {
-          dates.allotmentDate = new Date(
-            v?.childNodes[1]?.innerText
-          ).toLocaleDateString();
+          dates.allotmentDate = new Date(v?.childNodes[1]?.innerText)
+            .toISOString()
+            .slice(0, 10);
         }
         if (label?.includes('credit')) {
-          dates.sharesCreditDate = new Date(
-            v?.childNodes[1]?.innerText
-          ).toLocaleDateString();
+          dates.sharesCreditDate = new Date(v?.childNodes[1]?.innerText)
+            .toISOString()
+            .slice(0, 10);
         }
         if (label?.includes('refund')) {
-          dates.refundDate = new Date(
-            v?.childNodes[1]?.innerText
-          ).toLocaleDateString();
+          dates.refundDate = new Date(v?.childNodes[1]?.innerText)
+            .toISOString()
+            .slice(0, 10);
         }
         if (label?.includes('listing')) {
-          dates.listingDate = new Date(
-            v?.childNodes[1]?.innerText
-          ).toLocaleDateString();
+          dates.listingDate = new Date(v?.childNodes[1]?.innerText)
+            .toISOString()
+            .slice(0, 10);
         }
       });
     }
