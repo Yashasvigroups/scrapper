@@ -400,7 +400,7 @@ function getReport() {
       if (j == 0) return;
 
       if (i == 0) {
-        arr.push({ year: d?.innerText.split(' ')[2] });
+        arr.push({ year: d?.innerText });
       } else if (i == 1) {
         arr[j - 1].asset = d?.innerText.replaceAll(',', '');
       } else if (i == 2) {
