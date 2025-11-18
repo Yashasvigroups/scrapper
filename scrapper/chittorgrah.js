@@ -277,6 +277,7 @@ function getFirstTableDetails() {
 
   return obj;
 }
+
 function getIssueSize() {
   const ele = document.querySelectorAll('table');
   let sz = '';

@@ -4,6 +4,7 @@ require('dotenv').config();
 // routers
 const { chittorgrah, subscription } = require('./scrapper/chittorgrah');
 const { scrap: companyCodes } = require('./scrapper/companyCode');
+const { nse } = require('./scrapper/nse');
 
 // database connection
 // require('./dbConnection');
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/scrap-subscription/:title/:id', subscription);
 app.get('/scrap-details/:title/:id', chittorgrah);
 app.get('/company-codes', companyCodes);
+app.get('/nse/:symbol', nse);
 
 app.listen(process.env.PORT || 3002, (err, _) => {
   if (err) {
