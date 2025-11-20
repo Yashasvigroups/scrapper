@@ -41,5 +41,5 @@ jobs:
             docker rm scrapper || true
             echo "Restarting image-----------------------"
             docker run -d --pull always --restart always \
-            --name scrapper -p 3003:3002 \
+            --name scrapper -p 3002:3002 \
             ghcr.io/yashasvigroups/scrapper:latest

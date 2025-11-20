@@ -56,8 +56,5 @@ COPY . .
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Expose the API port
-EXPOSE 3002
-
 # Start the Node.js server
 CMD ["npm", "start"]
