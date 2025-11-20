@@ -4,6 +4,13 @@ FROM node:20-slim
 # Set working directory
 WORKDIR /app
 
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy the app source code
+COPY . .
+
 # Install Chromium dependencies for Puppeteer
 RUN apt-get update && apt-get install -y \
     chromium \
@@ -43,13 +50,6 @@ RUN apt-get update && apt-get install -y \
     wget \
     xdg-utils \
     && rm -rf /var/lib/apt/lists/*
-
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy the app source code
-COPY . .
 
 # Set environment variable to tell Puppeteer not to download Chromium
 # and use the system Chromium we installed

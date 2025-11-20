@@ -30,7 +30,11 @@ async function chittorgrah(req, res) {
   let url = 'https://www.chittorgarh.com/ipo/' + title + '/' + id;
   const browser = await puppeteer.launch({
     headers: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+    ],
   });
   const page = await browser.newPage();
   try {
@@ -142,6 +146,7 @@ async function chittorgrah(req, res) {
     console.error(err);
     res.status(500).json('internal server error');
   } finally {
+    await page.close();
     await browser.close();
   }
 }

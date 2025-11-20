@@ -3,28 +3,27 @@ const { SCRAP_URL } = require('../static/static');
 
 async function scrap(_, res) {
   const browser = await puppeteer.launch({
-    headless: false, // try non-headless first to debug
+    // headless: false, // try non-headless first to debug
     // executablePath: '/usr/bin/chromium',
     acceptInsecureCerts: true,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
-      '--window-size=1280,720',
+      // '--window-size=1280,720',
     ],
   });
 
   try {
-    const [cameo, bigshare, linkin, maashitla, kfintech, skyline] =
-      await Promise.all([
-        ScrapperCameo(browser),
-        ScrapperBigshare(browser),
-        ScrapperLinkintime(browser),
-        ScrapperMaashitla(browser),
-        ScrapperKfintech(browser),
-        ScrapperSkyline(browser),
-        // ScrapperPurva(browser),
-      ]);
+    const [cameo, bigshare, linkin, maashitla, skyline] = await Promise.all([
+      ScrapperCameo(browser),
+      ScrapperBigshare(browser),
+      ScrapperLinkintime(browser),
+      ScrapperMaashitla(browser),
+      ScrapperSkyline(browser),
+      // ScrapperKfintech(browser),
+      // ScrapperPurva(browser),
+    ]);
 
     return res.status(200).json({
       data: [
@@ -32,7 +31,7 @@ async function scrap(_, res) {
         ...bigshare,
         ...linkin,
         ...maashitla,
-        ...kfintech,
+        // ...kfintech,
         ...skyline,
       ],
       message: '',
